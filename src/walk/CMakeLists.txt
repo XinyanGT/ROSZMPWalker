@@ -32,10 +32,12 @@ find_package(DART REQUIRED)
 
 include_directories(${DARTExt_INCLUDEDIR})
 include_directories(${DART_INCLUDEDIR})
-include_directories( /home/yan/Course/Robotics/vrc-golem/dart-atlas/src . )
+#include_directories( /home/yan/Course/Robotics/vrc-golem/dart-atlas/src . )
+include_directories( /home/ana/Research/HUBO/vrc-golem/dart-atlas/src . )
 
 link_directories(${DART_LIBRARY_DIRS})
-link_directories( /home/yan/Course/Robotics/vrc-golem/dart-atlas/lib )
+#link_directories( /home/yan/Course/Robotics/vrc-golem/dart-atlas/lib )
+link_directories(/home/ana/Research/HUBO/vrc-golem/dart-atlas/lib )
 
 # Add plugin
 rosbuild_add_executable( walk  walk.cpp zmp/zmpUtilities.cpp )

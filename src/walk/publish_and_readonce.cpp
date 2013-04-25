@@ -684,7 +684,7 @@ int main( int argc, char** argv ) {
   /****************************************
    * Generate joint trajectory
    ***************************************/
-  gZU.setParameters( dt, 9.81 );
+  gZU.setParameters( dt, 9.81, dofs  );
   gZU.generateZmpPositions( numSteps, true, 
           stepLength, footSeparation,
           stepDuration,
