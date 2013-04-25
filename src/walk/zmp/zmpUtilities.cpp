@@ -87,9 +87,11 @@ zmpUtilities::~zmpUtilities() {
  * @function setParameters
  */
 void zmpUtilities::setParameters( const double &_dt,
-				  const double &_g ) {
+				  const double &_g,
+				  const Eigen::VectorXd &_initDofs ) {
   mdt = _dt;
   mG = _g;
+  mInitDofVals = _initDofs; // more than 28...
 }
 
 /**
@@ -607,43 +609,14 @@ void zmpUtilities::getJointTrajectories() {
   int nDofsNum = mAtlasSkel->getNumDofs();
   Eigen::VectorXd dofs(nDofsNum);
   dofs.setZero();
-printf("Num 	DOFs: %d \n", dofs.size() );
-  dofs(6) = 0;
-  dofs(9) = 0.0017;
-  dofs(12) = 0; 
-  dofs(16) = 0.781;
+  printf("Num 	DOFs: %d \n", dofs.size() );
+  
 
-  // Left Leg
-  dofs(7) = -0.0021;
-  dofs(10) = 0.0623;
-  dofs(13) = -0.2654;
-  dofs(18) = 0.4837; 
-  dofs(23) = -0.2012; 
-  dofs(27) = -0.0623;
-  
-  // Right Leg
-  dofs(8) = 0.0021;
-  dofs(11) = -0.0623; 
-  dofs(14) = -0.2654; 
-  dofs(19) = 0.4835;
-  dofs(24) = -0.20122;
-  dofs(28) = 0.0623;
-    
-  // Left Arm
-  dofs(15) = 0.2978;
-  dofs(20) = -1.3140;
-  dofs(25) = 2.0021;
-  dofs(29) = 0.4955;
-  dofs(31) = 0; 
-  dofs(33) = -0.01;
-  
-  // Right Arm
-  dofs(17) = 0.2978;
-  dofs(22) = 1.3140;
-  dofs(26) = 2.0021;
-  dofs(30) = -0.4955; 
-  dofs(32) = 0;
-  dofs(34) = 0.01;
+  //
+  for( int i = 0; i < dofs.size(); ++i ) {
+    dofs(i) = mInitDofVals(i);
+  }
+
   
   std::cout << "before set: " << dofs << std::endl;
   mAtlasSkel->setPose(dofs, true, false);
