@@ -126,6 +126,7 @@ void zmpUtilities::generateZmpPositions( int _numSteps,
 
   std::vector<Eigen::VectorXd> lf( numTotalPts, Eigen::Vector3d() );
   std::vector<Eigen::VectorXd> rf( numTotalPts, Eigen::Vector3d() );
+  std::vector<int> support( numTotalPts );
 
   leftFoot = mFootSeparation / 2.0;
   rightFoot = -1*mFootSeparation / 2.0;
@@ -163,6 +164,7 @@ void zmpUtilities::generateZmpPositions( int _numSteps,
     // Stay put left
     Eigen::Vector3d p; p << (1-1)*mStepLength, leftFoot, 0;
     std::fill( lf.begin(), lf.end(), p );
+    std::fill( support.begin(), support.end(), LEFT_SUPPORT );
   }
   
   else { 
@@ -174,11 +176,12 @@ void zmpUtilities::generateZmpPositions( int _numSteps,
     // Stay put right
     Eigen::Vector3d p; p << (1-1)*mStepLength, rightFoot, 0;
     std::fill( rf.begin(), rf.end(), p );
+    std::fill( support.begin(), support.end(), RIGHT_SUPPORT );
   }
   
   mRightFoot.insert( mRightFoot.end(), rf.begin(), rf.end() );
   mLeftFoot.insert( mLeftFoot.end(), lf.begin(), lf.end() );
-  
+  mSupportMode.insert( mSupportMode.end(), support.begin(), support.end() );
   
   // Switch feet
   tempFoot = supportFoot;
@@ -208,6 +211,7 @@ void zmpUtilities::generateZmpPositions( int _numSteps,
       // Stay put left
       Eigen::Vector3d p; p << (i-1)*mStepLength, leftFoot, 0;
       std::fill( lf.begin(), lf.end(), p );
+      std::fill( support.begin(), support.end(), LEFT_SUPPORT );
     }
 
     else { 
@@ -219,11 +223,12 @@ void zmpUtilities::generateZmpPositions( int _numSteps,
       // Stay put right
       Eigen::Vector3d p; p << (i-1)*mStepLength, rightFoot, 0;
       std::fill( rf.begin(), rf.end(), p );
+      std::fill( support.begin(), support.end(), RIGHT_SUPPORT );
     }
 
     mRightFoot.insert( mRightFoot.end(), rf.begin(), rf.end() );
     mLeftFoot.insert( mLeftFoot.end(), lf.begin(), lf.end() );
-    
+    mSupportMode.insert( mSupportMode.end(), support.begin(), support.end() );
 
     // Switch feet
     tempFoot = supportFoot;
@@ -252,6 +257,7 @@ void zmpUtilities::generateZmpPositions( int _numSteps,
     // Stay put left
     Eigen::Vector3d p; p << (_numSteps-1)*mStepLength, leftFoot, 0;
     std::fill( lf.begin(), lf.end(), p );
+    std::fill( support.begin(), support.end(), LEFT_SUPPORT );
   }
   
   else { 
@@ -263,11 +269,13 @@ void zmpUtilities::generateZmpPositions( int _numSteps,
     // Stay put right
     Eigen::Vector3d p; p << (_numSteps-1)*mStepLength, rightFoot, 0;
     std::fill( rf.begin(), rf.end(), p );
+    std::fill( support.begin(), support.end(), RIGHT_SUPPORT );
   }
   
   mRightFoot.insert( mRightFoot.end(), rf.begin(), rf.end() );
   mLeftFoot.insert( mLeftFoot.end(), lf.begin(), lf.end() );
-  
+  mSupportMode.insert( mSupportMode.end(), support.begin(), support.end() );
+
   // No need to switch feet
   
   
