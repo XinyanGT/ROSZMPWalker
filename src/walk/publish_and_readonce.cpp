@@ -484,6 +484,9 @@ void Relax(AtlasKinematics *AK, Skeleton *_atlas, VectorXd &dofs, double kp, dou
     }
   }
 
+//  dofs(7) = -0.0012852229728474995;
+//  dofs(8) = 0.0013642411907399676;
+
   // Get init position
   // Set in harness mode
   printf("Setting mode no_gravity \n");
