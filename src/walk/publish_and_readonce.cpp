@@ -694,7 +694,7 @@ int main( int argc, char** argv ) {
   gZU.getControllerGains( Qe, R, zg, numPreviewSteps );
   gZU.generateCOMPositions();
   gZU.getJointTrajectories();
-
+  gZU.print( "jointsWholeBody.txt", gZU.mWholeBody );
 
 
   /**************************************

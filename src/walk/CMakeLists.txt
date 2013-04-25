@@ -40,8 +40,8 @@ link_directories(${DART_LIBRARY_DIRS})
 link_directories(/home/ana/Research/HUBO/vrc-golem/dart-atlas/lib )
 
 # Add plugin
-rosbuild_add_executable( walk  walk.cpp zmp/zmpUtilities.cpp )
+#rosbuild_add_executable( walk  walk.cpp zmp/zmpUtilities.cpp )
 rosbuild_add_executable( publish_and_readonce publish_and_readonce.cpp zmp/zmpUtilities.cpp )
 
-target_link_libraries( walk ${DART_LIBRARIES} ${DARTExt_LIBRARIES} dart_atlas )
+#target_link_libraries( walk ${DART_LIBRARIES} ${DARTExt_LIBRARIES} dart_atlas )
 target_link_libraries( publish_and_readonce ${DART_LIBRARIES} ${DARTExt_LIBRARIES} dart_atlas )
