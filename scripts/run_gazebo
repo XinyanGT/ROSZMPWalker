@@ -1,0 +1,3 @@
+#!/bin/sh
+
+gazebo -u -s libgazebo_ros_api_plugin.so $1

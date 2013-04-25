@@ -1,0 +1,17 @@
+<package>
+  <description brief="ZMPWalker">
+
+     ZMPWalker
+
+  </description>
+  <author>yan</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/ZMPWalker</url>
+  <depend package="roscpp"/>
+  <depend package="trajectory_msgs"/>
+  <depend package="osrf_msgs"/>
+
+</package>
+
+

@@ -1,0 +1,11 @@
+<launch>
+	<arg name="gzname" default="gazebo" />
+
+	<!-- Start gazebo with Attila-->
+	<include file="$(find robotWalk)/launch/atlas_no_controllers.launch">
+		<arg name="gzname" value="$(arg gzname)" />
+	</include>
+
+	<!-- Start controllers -->
+	<include file="$(find robotWalk)/launch/atlas_bringup.launch" />
+</launch>
