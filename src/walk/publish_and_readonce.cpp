@@ -442,14 +442,16 @@ void Relax(AtlasKinematics *AK, Skeleton *_atlas, VectorXd &dofs, double kp, dou
 //  dofs(13) = -0.2856717835152658;
 //  dofs(18) = 0.5266262672930972; 
 //  dofs(23) = -0.21864856475431704; 
-//  dofs(27) = -0.062394234133471116;
+////  dofs(27) = -0.062394234133471116;
+////  dofs(27) = -dofs(10);
 
 //  dofs(8) = 0.0013642411907399676;
 //  dofs(11) = -0.06195623610921519; 
 //  dofs(14) = -0.2865128374461472; 
 //  dofs(19) = 0.5268958272322948;
 //  dofs(24) = -0.21621680953724365;
-//  dofs(28) = 0.06138342176132294;
+////  dofs(28) = 0.06138342176132294;
+////  dofs(28) = -dofs(11);
 
   dofs(15) = 0.2988754829726865;
   dofs(20) = -1.3138418263023999;
@@ -468,36 +470,35 @@ void Relax(AtlasKinematics *AK, Skeleton *_atlas, VectorXd &dofs, double kp, dou
   // use legIK, move legs
   Matrix4d twb = Matrix4d::Identity();
   Matrix4d leftTarget = AK->getLimbTransB(_atlas, MANIP_L_FOOT);
-  leftTarget(1,3) += 0.05;
-  leftTarget(2,3) += 0.02;
+  leftTarget(2,3) += 0.05;
+  leftTarget(1,3) += 0.08;
   Matrix4d rightTarget = AK->getLimbTransB(_atlas, MANIP_R_FOOT);
-  rightTarget(1,3) -= 0.05;
-  rightTarget(2,3) += 0.02;
+  rightTarget(2,3) += 0.05;
+  rightTarget(1,3) -= 0.08;
   VectorXd nearest(12);
   nearest.setZero();
   VectorXd legAngles(12);
   AK->stanceIK(twb, leftTarget, rightTarget, nearest, legAngles);
-
   for (int i = 0; i < 2; i++) {
     for (int j = 0; j < 6; j++) {
       dofs(AK->dof_ind[i][j]) = legAngles(i*6+j);
     }
   }
 
-//  dofs(7) = -0.0012852229728474995;
-//  dofs(8) = 0.0013642411907399676;
-
+  dofs(7) = 0.062852229728474995;
+  dofs(8) = -0.062642411907399676;
   // Get init position
   // Set in harness mode
   printf("Setting mode no_gravity \n");
   std_msgs::String mode;
-  mode.data = "harnessed";
+  mode.data = "pinned";
 //  mode.data = "no_gravity";
   gPubMode.publish( mode );
   printf("Out of setting \n");
   // Set robot in starting position  
   printf("Sending initial position \n");
   MoveDesireDofs(AK, _atlas, dofs, kp, kp, kp, kd, kd, kd, N);
+  sleep(2);
 
   printf("Just sent initial position \n");
 
@@ -617,7 +618,7 @@ int main( int argc, char** argv ) {
    * Move COM down
    *************************/
    
-  comDelta << 0, 0, -0.04;
+  comDelta << 0, 0, -0.06;
   leftDelta.setZero();
   rightDelta.setZero();
   cout << "***************************************" << endl;
@@ -647,9 +648,10 @@ int main( int argc, char** argv ) {
    *************************************/
   // number of steps to walk
   int numSteps = 12;
-  // lenght of a half step
+  // length of a half step
+//  double stepLength = 0.15;
   double stepLength = 0.15;
-  // half foot seperation
+  // foot seperation
   dofs_save = _atlas->getPose();
   UpdateDofs(AK, dofs);
 
@@ -662,8 +664,8 @@ int main( int argc, char** argv ) {
   _atlas->setPose(dofs);
 
   double footSeparation = (AK->getLimbTransW(_atlas, Twb, MANIP_L_FOOT)(1,3) - 
-                          AK->getLimbTransW(_atlas, Twb, MANIP_R_FOOT)(1,3) ) / 2;
-  cout << "Half foot seperation: " << footSeparation << endl;
+                          AK->getLimbTransW(_atlas, Twb, MANIP_R_FOOT)(1,3) );
+  cout << "foot seperation: " << footSeparation << endl;
   // one step time
   double stepDuration = 1.0;
   // move ZMP time

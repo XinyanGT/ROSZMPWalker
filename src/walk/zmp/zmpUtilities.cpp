@@ -553,6 +553,7 @@ void zmpUtilities::generateSwingPattern( std::vector<Eigen::VectorXd> &_footPos,
   l = 0;
 
   a = 0.5*sqrt( dx*dx + dy*dy );
+//  b = a / 3.1416;
   b = a / 3.1416;
 
   Eigen::Vector3d pos;
@@ -696,6 +697,11 @@ void zmpUtilities::getJointTrajectories() {
 
     if (AK->comIK( mAtlasSkel, com, Twb, mode, Tm, dofs) != true) {
       std::cout << "comIK failed!" << std::endl;
+      std::cout << "Twb: \n" << Twb << std::endl;
+      std::cout << "dcom: " << com.transpose() << std::endl;
+      std::cout << "Left foot: \n" << Tm[atlas::MANIP_L_FOOT] << std::endl;
+      std::cout << "Right foot: \n" << Tm[atlas::MANIP_R_FOOT] << std::endl;
+
       exit(1);
     }
     else { 

@@ -29,7 +29,7 @@ class zmpUtilities {
   
   void setParameters( const double &_dt,
 		      const double &_g,
-		      const Eigen::VectorXd &_initDofs ); 
+          const Eigen::VectorXd &_initDofs ); 
 
   /** Generate zmp x and y positions for a straight walk */
   void generateZmpPositions( int _numSteps = 5,
@@ -126,7 +126,6 @@ class zmpUtilities {
 
   std::vector<Eigen::VectorXd> mLeftLeg;
   std::vector<Eigen::VectorXd> mRightLeg;
-
   Eigen::VectorXd mInitDofVals;
 
 };
