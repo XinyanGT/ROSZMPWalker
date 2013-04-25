@@ -14,6 +14,11 @@
 
 #include <atlas/AtlasKinematics.h>
 
+enum SUPPORT_MODES {
+  DOUBLE_SUPPORT = 0,
+  LEFT_SUPPORT,
+  RIGHT_SUPPORT
+};
 
 /**
  * @class zmpUtilities
@@ -114,6 +119,7 @@ class zmpUtilities {
 
   std::vector<int> mDofIndices;
   std::vector<Eigen::VectorXd> mWholeBody;
+  std::vector<int> mSupportMode;
 
   // Stored x, y and u
   std::vector<Eigen::VectorXd> mX; /**< CoM (x,y)T */
