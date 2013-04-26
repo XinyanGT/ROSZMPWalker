@@ -398,7 +398,16 @@ void MoveJointTractoryAdv(AtlasKinematics *AK, Skeleton *_atlas,
       break;
 
     }
+    cout << "JOINT_KP:";
+    for (int i = 0; i < 28; i++)
+      cout << "\t" << jointcommands.kp_position[i];
 
+    cout << endl;
+    cout << "JOINT_KD:";
+    for (int i = 0; i < 28; i++)
+      cout << "\t" << jointcommands.kd_position[i];
+
+    cout << endl;
     pub_joint_commands_.publish( jointcommands );
     loop_rate->sleep();
   }
@@ -627,8 +636,8 @@ void Relax(AtlasKinematics *AK, Skeleton *_atlas, VectorXd &dofs, double kp, dou
 //  mode.data = "feet";
 // gPubMode.publish( mode );
   
-//  mode.data = "nominal";
-//  gPubMode.publish( mode );
+  mode.data = "nominal";
+  gPubMode.publish( mode );
 }
 
 
@@ -738,7 +747,7 @@ int main( int argc, char** argv ) {
    * Move COM down
    *************************/
    
-  comDelta << 0, 0, -0.02;
+  comDelta << 0, 0, -0.05;
   leftDelta.setZero();
   rightDelta.setZero();
   cout << "***************************************" << endl;
@@ -789,11 +798,11 @@ int main( int argc, char** argv ) {
   // one step time
 //  double stepDuration = 1.0;
 
-  double stepDuration = 1.5;
+  double stepDuration = 3;
   // move ZMP time
-  double slopeTime = 1.0;
+  double slopeTime = 1;
   // keep ZMP time
-  double levelTime = 0.5;
+  double levelTime = 2;
 
   // command sending period
   double dt = 1/frequency;
@@ -827,8 +836,8 @@ int main( int argc, char** argv ) {
   right_support_kp.resize(28);
   right_support_ki.resize(28);
   
-  left_support_kp << 40, default_kp, default_kp, default_kp,
-                     40,  strong_kp, 40, strong_kp, 40, strong_kp, 
+  left_support_kp << default_kp, default_kp, default_kp, default_kp,
+                     default_kp,  strong_kp, 40, strong_kp, 40, strong_kp, 
                      weak_kp, weak_kp, 40, weak_kp, 20, weak_kp,
                      default_kp, default_kp, default_kp, default_kp, default_kp, default_kp,         
                      default_kp, default_kp, default_kp, default_kp, default_kp, default_kp,
@@ -840,9 +849,9 @@ int main( int argc, char** argv ) {
                      default_ki, default_ki, default_ki, default_ki, default_ki, default_ki,
                      default_ki, default_ki, default_ki, default_ki, default_ki, default_ki;
 
-  right_support_kp << 40, default_kp, default_kp, default_kp,
+  right_support_kp << default_kp, default_kp, default_kp, default_kp,
                      weak_kp, weak_kp, 40, weak_kp, 20, weak_kp,
-                     40,  strong_kp, 40, strong_kp, 40, strong_kp, 
+                     strong_kp,  strong_kp, 40, strong_kp, 40, strong_kp, 
                      default_kp, default_kp, default_kp, default_kp, default_kp, default_kp,
                      default_kp, default_kp, default_kp, default_kp, default_kp, default_kp;
                   
@@ -883,7 +892,7 @@ int main( int argc, char** argv ) {
 
   for (int i = 0; i < gZU.mSupportMode.size(); i++)
     cout << gZU.mSupportMode[i];
-  
+
   MoveJointTractoryAdv(AK, _atlas, dofs, gZU.mWholeBody, gZU.mSupportMode, 
                         double_support_kp,double_support_ki,
                         left_support_kp, left_support_ki,
