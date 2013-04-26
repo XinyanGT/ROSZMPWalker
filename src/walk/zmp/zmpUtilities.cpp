@@ -735,6 +735,8 @@ void zmpUtilities::getJointTrajectories() {
       //std::cout << "comIK success" << std::endl;
     }
 
+    mDartDofs.push_back(dofs);
+
     // Store
     dofs = mAtlasSkel->getPose();
 
@@ -767,7 +769,7 @@ atlas::AtlasKinematics* zmpUtilities::prepareAtlasKinematics() {
 
     DartLoader dart_loader;
    printf("Loading skel \n");
-    robotics::World *mWorld = dart_loader.parseWorld("/home/yan/Project/ros/ZMPWalker/src/walk/zmp/atlas/atlas_world.urdf");
+    robotics::World *mWorld = dart_loader.parseWorld(ATLAS_DATA_PATH "atlas/atlas_world.urdf");
 	printf("End loading skel \n");
     mAtlasSkel = mWorld->getSkeleton("atlas");
     mAtlasKin = new atlas::AtlasKinematics();

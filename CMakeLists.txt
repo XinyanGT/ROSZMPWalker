@@ -81,11 +81,12 @@ find_package(DART REQUIRED)
 
 include_directories(${DARTExt_INCLUDEDIR})
 include_directories(${DART_INCLUDEDIR})
-include_directories( /home/yan/Course/Robotics/vrc-golem/dart-atlas/src . )
+include_directories( /home/eric/ros/vrc-golem/dart-atlas/src . )
+include_directories(/home/eric/ros/ROSZMPWalker/src)
 
 link_directories(${DART_LIBRARY_DIRS})
-link_directories( /home/yan/Course/Robotics/vrc-golem/dart-atlas/lib )
-
+link_directories( /home/eric/ros/vrc-golem/dart-atlas/lib )
+link_directories( /home/eric/golems/dart/lib)
 
 
 # Eigen
@@ -97,6 +98,9 @@ rosbuild_add_executable( publish_joint_command_fromTxt src/publish_joint_command
 rosbuild_add_executable( subscribe_jointStates_test src/subscribe_jointStates_test.cpp )
 rosbuild_add_executable( test_keyframes src/test_keyframes.cpp )
 
+# Eric
+rosbuild_add_executable( zmp_walk src/zmp/zmp_walk.cpp src/walk/zmp/zmpUtilities.cpp src/zmp/main.cpp)
+target_link_libraries( zmp_walk dart_atlas ${DART_LIBRARIES} ${DARTExt_LIBRARIES})
 
 # Walk
 add_subdirectory( src/walk )
