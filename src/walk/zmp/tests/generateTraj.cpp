@@ -16,30 +16,35 @@ int main( int argc, char* argv[] ) {
   double stepDuration = 1.0;
   double slopeTime = 0.15;
   double levelTime = 0.85;
-  double dt = 0.01;
-  double zg = 0.84;
+  double dt = 0.001;
+  double zg = 0.8438;
   int numPreviewSteps = 2;
-  double Qe = 1;
-  double R = 0.000001;
+  double Qe = 10000000;
+  double R = 10;
+  int numWaitSteps = 1;
 
-  zp.setParameters( dt, 9.81 );
-  zp.generateZmpPositions( 10, true, 
+	Eigen::VectorXd zeroPose = Eigen::VectorXd::Zero(35);
+  zp.setParameters( dt, 9.81, zeroPose );
+  zp.generateZmpPositions( 8, true, 
 			   stepLength, footSeparation,
 			   stepDuration,
 			   slopeTime,
-			   levelTime );
-  zp.print( std::string("zmpxy.txt"), zp.mZMP );
-  zp.print( std::string("leftFoot.txt"), zp.mLeftFoot );
-  zp.print( std::string("rightFoot.txt"), zp.mRightFoot );
-
+			   levelTime,
+				numWaitSteps );
+  printf("Gotten zmp positions \n");
   zp.getControllerGains( Qe, R, zg, numPreviewSteps );
-
+ printf("Gotten controller gains \n");
   zp.generateCOMPositions();
   printf("No problem \n");
-  zp.print( std::string("com.txt"), zp.mX );
-  zp.print( std::string("zmpapprox.txt"), zp.mY );
-
   zp.getJointTrajectories();
+	printf("Gotten trajectories \n");
+
+  zp.print( std::string("zmpxy.txt"), zp.mZMP );
+  zp.print( std::string("com.txt"), zp.mX ); 
+  zp.print( std::string("zmpFromDynamics.txt"), zp.mY ); 
+  zp.print( std::string("leftFoot.txt"), zp.mLeftFoot ); 
+  zp.print( std::string("rightFoot.txt"), zp.mRightFoot );
+
   zp.print( std::string("leftLeg.txt"), zp.mLeftLeg );
   
   

@@ -131,7 +131,35 @@ void zmpUtilities::generateZmpPositions( int _numSteps,
   leftFoot = mFootSeparation / 2.0;
   rightFoot = -1*mFootSeparation / 2.0;
 
+//-- WAIT TIME START
+	for( int i = 0; i < _numWaitSteps; ++i ) {
+  		//** Generate ZMP x **	
+  		start = 0; end = 0;
+  		temp = generateSmoothPattern( start, end, numSlopePts, numLevelPts );
+  		zmpx.insert( zmpx.end(), temp.begin(), temp.end() );
+
+  		//** Generate ZMP y **
+  		start = 0; end = 0;
+  		temp = generateSmoothPattern( start, end, numSlopePts, numLevelPts );
+ 	 	zmpy.insert( zmpy.end(), temp.begin(), temp.end() );
+
+  		//** Generate foot placements **
+
+   	 	// Stay put right
+    	Eigen::Vector3d p; p << 0, rightFoot, 0;
+    	std::fill( rf.begin(), rf.end(), p );
+    	std::fill( support.begin(), support.end(), DOUBLE_SUPPORT );
+
+    	// Stay put left
+    	p << 0, leftFoot, 0;
+    	std::fill( lf.begin(), lf.end(), p );
+    	std::fill( support.begin(), support.end(), DOUBLE_SUPPORT );
   
+  		mRightFoot.insert( mRightFoot.end(), rf.begin(), rf.end() );
+ 	 	mLeftFoot.insert( mLeftFoot.end(), lf.begin(), lf.end() );
+  		mSupportMode.insert( mSupportMode.end(), support.begin(), support.end() );
+  	}
+
   //-- Start
   if( _startLeftFoot == true ) {
     supportFoot = rightFoot;
@@ -510,8 +538,10 @@ void zmpUtilities::generateCOMPositions( ) {
   mU.push_back( u );
  
   // t = 1*dt to ... 
+  printf("[COM Calculation] zmp size: %d n: %d \n", mZMP.size(), mN );
+  printf("Calculating from i: %d to i: %d \n", 0, mZMP.size() - mN - 1 );
   for( int i = 0; i < mZMP.size() - mN - 1; ++i ) {
-
+    if( i % 100 == 0) { printf("i: %d \n", i); }
     x = mA*x + mB*u;
     y = mC*x;
 
