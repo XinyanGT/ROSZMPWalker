@@ -165,6 +165,7 @@ void zmpUtilities::generateZmpPositions( int _numSteps,
     Eigen::Vector3d p; p << (1-1)*mStepLength, leftFoot, 0;
     std::fill( lf.begin(), lf.end(), p );
     std::fill( support.begin(), support.end(), LEFT_SUPPORT );
+    std::fill( support.begin(), support.begin() + numSlopePts, DOUBLE_SUPPORT );
   }
   
   else { 
@@ -177,6 +178,7 @@ void zmpUtilities::generateZmpPositions( int _numSteps,
     Eigen::Vector3d p; p << (1-1)*mStepLength, rightFoot, 0;
     std::fill( rf.begin(), rf.end(), p );
     std::fill( support.begin(), support.end(), RIGHT_SUPPORT );
+    std::fill( support.begin(), support.begin() + numSlopePts, DOUBLE_SUPPORT );
   }
   
   mRightFoot.insert( mRightFoot.end(), rf.begin(), rf.end() );
@@ -212,6 +214,7 @@ void zmpUtilities::generateZmpPositions( int _numSteps,
       Eigen::Vector3d p; p << (i-1)*mStepLength, leftFoot, 0;
       std::fill( lf.begin(), lf.end(), p );
       std::fill( support.begin(), support.end(), LEFT_SUPPORT );
+    std::fill( support.begin(), support.begin() + numSlopePts, DOUBLE_SUPPORT );
     }
 
     else { 
@@ -224,6 +227,7 @@ void zmpUtilities::generateZmpPositions( int _numSteps,
       Eigen::Vector3d p; p << (i-1)*mStepLength, rightFoot, 0;
       std::fill( rf.begin(), rf.end(), p );
       std::fill( support.begin(), support.end(), RIGHT_SUPPORT );
+    std::fill( support.begin(), support.begin() + numSlopePts, DOUBLE_SUPPORT );
     }
 
     mRightFoot.insert( mRightFoot.end(), rf.begin(), rf.end() );
@@ -258,6 +262,7 @@ void zmpUtilities::generateZmpPositions( int _numSteps,
     Eigen::Vector3d p; p << (_numSteps-1)*mStepLength, leftFoot, 0;
     std::fill( lf.begin(), lf.end(), p );
     std::fill( support.begin(), support.end(), LEFT_SUPPORT );
+    std::fill( support.begin(), support.begin() + numSlopePts, DOUBLE_SUPPORT );
   }
   
   else { 
@@ -270,6 +275,7 @@ void zmpUtilities::generateZmpPositions( int _numSteps,
     Eigen::Vector3d p; p << (_numSteps-1)*mStepLength, rightFoot, 0;
     std::fill( rf.begin(), rf.end(), p );
     std::fill( support.begin(), support.end(), RIGHT_SUPPORT );
+    std::fill( support.begin(), support.begin() + numSlopePts, DOUBLE_SUPPORT );
   }
   
   mRightFoot.insert( mRightFoot.end(), rf.begin(), rf.end() );
