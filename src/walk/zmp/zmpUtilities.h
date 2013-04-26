@@ -121,6 +121,8 @@ class zmpUtilities {
   std::vector<Eigen::VectorXd> mWholeBody;
   std::vector<int> mSupportMode;
 
+  std::vector<Eigen::VectorXd> mDartDofs; ///< joint trajs in Dart ordering
+
   // Stored x, y and u
   std::vector<Eigen::VectorXd> mX; /**< CoM (x,y)T */
   std::vector<Eigen::VectorXd> mY; /**< ZMP (from model) */
