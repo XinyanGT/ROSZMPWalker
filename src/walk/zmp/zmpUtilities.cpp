@@ -165,7 +165,6 @@ void zmpUtilities::generateZmpPositions( int _numSteps,
     Eigen::Vector3d p; p << (1-1)*mStepLength, leftFoot, 0;
     std::fill( lf.begin(), lf.end(), p );
     std::fill( support.begin(), support.end(), LEFT_SUPPORT );
-    std::fill( support.begin(), support.begin() + numSlopePts, DOUBLE_SUPPORT );
   }
   
   else { 
@@ -178,7 +177,6 @@ void zmpUtilities::generateZmpPositions( int _numSteps,
     Eigen::Vector3d p; p << (1-1)*mStepLength, rightFoot, 0;
     std::fill( rf.begin(), rf.end(), p );
     std::fill( support.begin(), support.end(), RIGHT_SUPPORT );
-    std::fill( support.begin(), support.begin() + numSlopePts, DOUBLE_SUPPORT );
   }
   
   mRightFoot.insert( mRightFoot.end(), rf.begin(), rf.end() );
@@ -214,7 +212,6 @@ void zmpUtilities::generateZmpPositions( int _numSteps,
       Eigen::Vector3d p; p << (i-1)*mStepLength, leftFoot, 0;
       std::fill( lf.begin(), lf.end(), p );
       std::fill( support.begin(), support.end(), LEFT_SUPPORT );
-      std::fill( support.begin(), support.begin() + numSlopePts, DOUBLE_SUPPORT );
     }
 
     else { 
@@ -227,7 +224,6 @@ void zmpUtilities::generateZmpPositions( int _numSteps,
       Eigen::Vector3d p; p << (i-1)*mStepLength, rightFoot, 0;
       std::fill( rf.begin(), rf.end(), p );
       std::fill( support.begin(), support.end(), RIGHT_SUPPORT );
-      std::fill( support.begin(), support.begin() + numSlopePts, DOUBLE_SUPPORT );
     }
 
     mRightFoot.insert( mRightFoot.end(), rf.begin(), rf.end() );
@@ -262,7 +258,6 @@ void zmpUtilities::generateZmpPositions( int _numSteps,
     Eigen::Vector3d p; p << (_numSteps-1)*mStepLength, leftFoot, 0;
     std::fill( lf.begin(), lf.end(), p );
     std::fill( support.begin(), support.end(), LEFT_SUPPORT );
-    std::fill( support.begin(), support.begin() + numSlopePts, DOUBLE_SUPPORT );
   }
   
   else { 
@@ -275,7 +270,6 @@ void zmpUtilities::generateZmpPositions( int _numSteps,
     Eigen::Vector3d p; p << (_numSteps-1)*mStepLength, rightFoot, 0;
     std::fill( rf.begin(), rf.end(), p );
     std::fill( support.begin(), support.end(), RIGHT_SUPPORT );
-    std::fill( support.begin(), support.begin() + numSlopePts, DOUBLE_SUPPORT );
   }
   
   mRightFoot.insert( mRightFoot.end(), rf.begin(), rf.end() );
@@ -568,7 +562,7 @@ void zmpUtilities::generateSwingPattern( std::vector<Eigen::VectorXd> &_footPos,
 
   a = 0.5*sqrt( dx*dx + dy*dy );
 //  b = a / 3.1416;
-  b = a / 3.1416;
+  b = a / 2;
 
   Eigen::Vector3d pos;
   for( int i = 0; i < _numPts; ++i ) {
@@ -683,6 +677,24 @@ void zmpUtilities::getJointTrajectories() {
 
   for( int i = 0; i < mX.size(); ++i ) {
 
+    /**************************************
+     * Set mode based on stance
+     **************************************/
+    switch (mSupportMode[i]) {
+      case DOUBLE_SUPPORT:
+        mode[atlas::MANIP_L_FOOT] = atlas::IK_MODE_SUPPORT;
+        mode[atlas::MANIP_R_FOOT] = atlas::IK_MODE_SUPPORT;
+        break;
+      case LEFT_SUPPORT:
+        mode[atlas::MANIP_L_FOOT] = atlas::IK_MODE_SUPPORT;
+        mode[atlas::MANIP_R_FOOT] = atlas::IK_MODE_WORLD;
+        break;
+      case RIGHT_SUPPORT:
+        mode[atlas::MANIP_L_FOOT] = atlas::IK_MODE_WORLD;
+        mode[atlas::MANIP_R_FOOT] = atlas::IK_MODE_SUPPORT;
+        break;
+      }
+
     /*************************
      * comIK
      ************************/
@@ -711,6 +723,7 @@ void zmpUtilities::getJointTrajectories() {
 
     if (AK->comIK( mAtlasSkel, com, Twb, mode, Tm, dofs) != true) {
       std::cout << "comIK failed!" << std::endl;
+      std::cout << "Support Mode: " << mSupportMode[i] << std::endl;
       std::cout << "Twb: \n" << Twb << std::endl;
       std::cout << "dcom: " << com.transpose() << std::endl;
       std::cout << "Left foot: \n" << Tm[atlas::MANIP_L_FOOT] << std::endl;

@@ -77,6 +77,17 @@ void MoveJointTractory(AtlasKinematics *AK, Skeleton *_atlas,
                        const double rightKd, const double otherKd);
 
 
+/**********************************************************
+ * Move Atlas based on joint trajectory and support info
+ **********************************************************/
+void MoveJointTractoryAdv(AtlasKinematics *AK, Skeleton *_atlas, 
+                        VectorXd &dofs,
+                        const std::vector<Eigen::VectorXd> &_zmp,
+                        const std::vector<int> supportInfo,
+                        const VectorXd &double_support_kp, const VectorXd &double_support_ki,
+                        const VectorXd &left_support_kp, const VectorXd &left_support_ki,
+                        const VectorXd &right_support_kp, const VectorXd &right_support_ki);
+
 /*************************************************
  * Move Atlas based on comIK
  *************************************************/

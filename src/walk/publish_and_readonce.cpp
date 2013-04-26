@@ -310,6 +310,124 @@ void MoveJointTractory(AtlasKinematics *AK, Skeleton *_atlas,
 }
 
 
+/**********************************************************
+ * Move Atlas based on joint trajectory and support info
+ **********************************************************/
+void MoveJointTractoryAdv(AtlasKinematics *AK, Skeleton *_atlas, 
+                        VectorXd &dofs,
+                        const std::vector<Eigen::VectorXd> &_zmp,
+                        const std::vector<int> supportInfo,
+                        const VectorXd &double_support_kp, const VectorXd &double_support_ki,
+                        const VectorXd &left_support_kp, const VectorXd &left_support_ki,
+                        const VectorXd &right_support_kp, const VectorXd &right_support_ki) 
+{
+
+ /*************************************
+   * Update pos
+   *************************************/
+  VectorXd dofs_save; 
+  dofs_save = _atlas->getPose();
+
+  UpdateDofs(AK, dofs);
+
+
+  cout << "*************************************" << endl;
+  cout << "Before publishing trajectory" << endl;
+  cout << "*************************************" << endl;
+  cout << "POS ERROR: " << (dofs_save - dofs).norm() << endl;
+  cout << "*************************************" << endl;
+
+
+  for (int i = 0; i < _zmp.size(); i++) {
+    switch (supportInfo[i]) {
+
+      case DOUBLE_SUPPORT:
+
+        for (int j = 0; j < 4; j++) {
+          jointcommands.position[j] = _zmp[i](j);
+          jointcommands.kp_position[j] = jointcommands_saved.kp_position[j] * double_support_kp(j);
+          jointcommands.kd_position[j] = jointcommands_saved.kd_position[j] * double_support_ki(j);
+        }
+
+        for (int j = 0; j < NUM_MANIPULATORS; j++) {
+          for (int k = 0; k < 6; k++) {
+            jointcommands.position[j*6+k+4] = _zmp[i](j*6+k+4);
+            jointcommands.kp_position[j*6+k+4] = jointcommands_saved.kp_position[j*6+k+4] * 
+                                                  double_support_kp(j*6+k+4);
+            jointcommands.kd_position[j*6+k+4] = jointcommands_saved.kd_position[j*6+k+4] * 
+                                                  double_support_ki(j*6+k+4);
+          }
+        }
+        cout << "DOUBLE_SUPPORT: " << double_support_kp.transpose() << endl;
+        break;
+
+      case LEFT_SUPPORT:
+        for (int j = 0; j < 4; j++) {
+          jointcommands.position[j] = _zmp[i](j);
+          jointcommands.kp_position[j] = jointcommands_saved.kp_position[j] * left_support_kp(j);
+          jointcommands.kd_position[j] = jointcommands_saved.kd_position[j] * left_support_ki(j);
+        }
+        for (int j = 0; j < NUM_MANIPULATORS; j++) {
+          for (int k = 0; k < 6; k++) {
+            jointcommands.position[j*6+k+4] = _zmp[i](j*6+k+4);
+            jointcommands.kp_position[j*6+k+4] = jointcommands_saved.kp_position[j*6+k+4] * 
+                                                  left_support_kp(j*6+k+4);
+            jointcommands.kd_position[j*6+k+4] = jointcommands_saved.kd_position[j*6+k+4] * 
+                                                  left_support_ki(j*6+k+4);
+          }
+        }
+      cout << "LEFT_SUPPORT: " << left_support_kp.transpose() << endl;
+      break;
+
+      case RIGHT_SUPPORT:
+        for (int j = 0; j < 4; j++) {
+          jointcommands.position[j] = _zmp[i](j);
+          jointcommands.kp_position[j] = jointcommands_saved.kp_position[j] * right_support_kp(j);
+          jointcommands.kd_position[j] = jointcommands_saved.kd_position[j] * right_support_ki(j);
+        }
+        for (int j = 0; j < NUM_MANIPULATORS; j++) {
+          for (int k = 0; k < 6; k++) {
+            jointcommands.position[j*6+k+4] = _zmp[i](j*6+k+4);
+            jointcommands.kp_position[j*6+k+4] = jointcommands_saved.kp_position[j*6+k+4] * 
+                                                  right_support_kp(j*6+k+4);
+            jointcommands.kd_position[j*6+k+4] = jointcommands_saved.kd_position[j*6+k+4] * 
+                                                  right_support_ki(j*6+k+4);
+          }
+        }
+      cout << "RIGHT_SUPPORT: " << right_support_kp.transpose() << endl;
+      break;
+
+    }
+
+    pub_joint_commands_.publish( jointcommands );
+    loop_rate->sleep();
+  }
+
+
+  /************************************************
+   * Update dofs in DART
+   ************************************************/
+  for (int i = 0; i < 4; i++) {
+    dofs(AK->dof_misc[i]) = _zmp[_zmp.size()-1](i);
+  }
+
+  for (int i = 0; i < NUM_MANIPULATORS; i++) {
+    for (int j = 0; j < 6; j++) {
+      dofs(AK->dof_ind[i][j]) = _zmp[_zmp.size()-1][i*6+j+4];
+    }
+  }
+
+  dofs_save = dofs;
+  UpdateDofs(AK, dofs);
+
+  cout << "*************************************" << endl;
+  cout << "After publishing trajectory" << endl;
+  cout << "*************************************" << endl;
+  cout << "POS ERROR: " << (dofs_save - dofs).norm() << endl;
+  cout << "*************************************" << endl;
+
+}
+
 
 
 /*************************************************
@@ -470,11 +588,13 @@ void Relax(AtlasKinematics *AK, Skeleton *_atlas, VectorXd &dofs, double kp, dou
   // use legIK, move legs
   Matrix4d twb = Matrix4d::Identity();
   Matrix4d leftTarget = AK->getLimbTransB(_atlas, MANIP_L_FOOT);
-  leftTarget(2,3) += 0.05;
-  leftTarget(1,3) += 0.08;
+  leftTarget(2,3) += 0.03;
+  leftTarget(1,3) += 0.03;
+//  leftTarget(1,3) += 0.1;
   Matrix4d rightTarget = AK->getLimbTransB(_atlas, MANIP_R_FOOT);
-  rightTarget(2,3) += 0.05;
-  rightTarget(1,3) -= 0.08;
+  rightTarget(2,3) += 0.03;
+  rightTarget(1,3) -= 0.03;
+//  rightTarget(1,3) -= 0.1;
   VectorXd nearest(12);
   nearest.setZero();
   VectorXd legAngles(12);
@@ -507,8 +627,8 @@ void Relax(AtlasKinematics *AK, Skeleton *_atlas, VectorXd &dofs, double kp, dou
 //  mode.data = "feet";
 // gPubMode.publish( mode );
   
-  mode.data = "nominal";
-  gPubMode.publish( mode );
+//  mode.data = "nominal";
+//  gPubMode.publish( mode );
 }
 
 
@@ -581,7 +701,7 @@ int main( int argc, char** argv ) {
 
   _atlas->setPose(dofs, true);
 
-  Relax(AK, _atlas, dofs, 20, 1.2, 1000);
+  Relax(AK, _atlas, dofs, 10, 1.2, 1000);
 
 
 
@@ -618,12 +738,12 @@ int main( int argc, char** argv ) {
    * Move COM down
    *************************/
    
-  comDelta << 0, 0, -0.06;
+  comDelta << 0, 0, -0.02;
   leftDelta.setZero();
   rightDelta.setZero();
   cout << "***************************************" << endl;
   cout << "Move COM dowm" << endl;
-  MoveCOMIK(AK, _atlas, Twb, Twm, dofs, comDelta, leftDelta, rightDelta, 20, 20, 20, 1.2, 1.2, 1.2, 1000);
+  MoveCOMIK(AK, _atlas, Twb, Twm, dofs, comDelta, leftDelta, rightDelta, 10, 10, 10, 1.2, 1.2, 1.2, 1000);
 
 
 //  /*******************************
@@ -637,7 +757,6 @@ int main( int argc, char** argv ) {
 //  MoveCOMIK(AK, _atlas, Twb, Twm, dofs, comDelta, leftDelta, rightDelta, 30, 20, 20, 1.3, 1.2, 1.2, 2000);
 
   
-    // Variables
 
   /************************************
    * ZMP walking
@@ -647,10 +766,11 @@ int main( int argc, char** argv ) {
    * Set parameters for ZMP walker
    *************************************/
   // number of steps to walk
-  int numSteps = 12;
+  int numSteps = 30;
   // length of a half step
-//  double stepLength = 0.15;
   double stepLength = 0.15;
+//  double stepLength = 0.2;
+
   // foot seperation
   dofs_save = _atlas->getPose();
   UpdateDofs(AK, dofs);
@@ -667,11 +787,14 @@ int main( int argc, char** argv ) {
                           AK->getLimbTransW(_atlas, Twb, MANIP_R_FOOT)(1,3) );
   cout << "foot seperation: " << footSeparation << endl;
   // one step time
-  double stepDuration = 1.0;
+//  double stepDuration = 1.0;
+
+  double stepDuration = 1.5;
   // move ZMP time
-  double slopeTime = 0.15;
+  double slopeTime = 1.0;
   // keep ZMP time
-  double levelTime = 0.85;
+  double levelTime = 0.5;
+
   // command sending period
   double dt = 1/frequency;
   // height of COM
@@ -680,17 +803,70 @@ int main( int argc, char** argv ) {
   // preview how many steps
   int numPreviewSteps = 2;
 
-//  double Qe = 1;
-//  double R = 1e-6;
+// double Qe = 1;
+// double R = 1e-6;
   double Qe = 1e7;
   double R = 10;
+  double default_kp = 20;
+  double strong_kp = 20;
+  double weak_kp = 20;
+
+  double default_ki = 1.3;
+  double strong_ki = 1.3;
+  double weak_ki = 1.3;
+
+  VectorXd double_support_kp, double_support_ki;
+  VectorXd left_support_kp, left_support_ki;
+  VectorXd right_support_kp, right_support_ki;
+
+  double_support_kp = VectorXd::Constant(28, default_kp);
+  double_support_ki = VectorXd::Constant(28, default_ki);
+
+  left_support_kp.resize(28);
+  left_support_ki.resize(28);
+  right_support_kp.resize(28);
+  right_support_ki.resize(28);
+  
+  left_support_kp << 40, default_kp, default_kp, default_kp,
+                     40,  strong_kp, 40, strong_kp, 40, strong_kp, 
+                     weak_kp, weak_kp, 40, weak_kp, 20, weak_kp,
+                     default_kp, default_kp, default_kp, default_kp, default_kp, default_kp,         
+                     default_kp, default_kp, default_kp, default_kp, default_kp, default_kp,
+
+
+  left_support_ki << default_ki, default_ki, default_ki, default_ki,
+                     strong_ki,  strong_ki, strong_ki, strong_ki, strong_ki, strong_ki, 
+                     weak_ki, weak_ki, weak_ki, weak_ki, weak_ki, weak_ki,
+                     default_ki, default_ki, default_ki, default_ki, default_ki, default_ki,
+                     default_ki, default_ki, default_ki, default_ki, default_ki, default_ki;
+
+  right_support_kp << 40, default_kp, default_kp, default_kp,
+                     weak_kp, weak_kp, 40, weak_kp, 20, weak_kp,
+                     40,  strong_kp, 40, strong_kp, 40, strong_kp, 
+                     default_kp, default_kp, default_kp, default_kp, default_kp, default_kp,
+                     default_kp, default_kp, default_kp, default_kp, default_kp, default_kp;
+                  
+ 
+  right_support_ki << default_ki, default_ki, default_ki, default_ki,
+                     weak_ki, weak_ki, weak_ki, weak_ki, weak_ki, weak_ki,
+                     strong_ki,  strong_ki, strong_ki, strong_ki, strong_ki, strong_ki, 
+                     default_ki, default_ki, default_ki, default_ki, default_ki, default_ki,
+                     default_ki, default_ki, default_ki, default_ki, default_ki, default_ki;
+
+
+  cout << "double kp: " << double_support_kp.transpose() << endl;
+  cout << "double ki: " << double_support_ki.transpose() << endl;
+  cout << "left kp: " << left_support_kp.transpose() << endl;
+  cout << "left ki: " << left_support_ki.transpose() << endl;
+  cout << "right kp: " << right_support_kp.transpose() << endl;
+  cout << "right ki: " << right_support_ki.transpose() << endl;
 
 
   /****************************************
-   * Generate joint trajectory
-   ***************************************/
-  gZU.setParameters( dt, 9.81, dofs  );
-  gZU.generateZmpPositions( numSteps, true, 
+  * Generate joint trajectory
+  ***************************************/
+  gZU.setParameters( dt, 9.81, dofs );
+  gZU.generateZmpPositions( numSteps, true,
           stepLength, footSeparation,
           stepDuration,
           slopeTime,
@@ -701,11 +877,17 @@ int main( int argc, char** argv ) {
   gZU.getJointTrajectories();
   gZU.print( "jointsWholeBody.txt", gZU.mWholeBody );
 
+  // Controller gains G1, G2
+  cout << "G1: " << gZU.mG1 << endl;
+  cout << "G2: " << gZU.mG2 << endl;
 
-  /**************************************
-   * Publish joint trajectory
-   ****************************************/
-  MoveJointTractory(AK, _atlas, dofs, gZU.mWholeBody, 20, 20, 20, 1.2, 1.2, 1.2);
+  for (int i = 0; i < gZU.mSupportMode.size(); i++)
+    cout << gZU.mSupportMode[i];
+  
+  MoveJointTractoryAdv(AK, _atlas, dofs, gZU.mWholeBody, gZU.mSupportMode, 
+                        double_support_kp,double_support_ki,
+                        left_support_kp, left_support_ki,
+                        right_support_kp, right_support_ki);
 
   
   
