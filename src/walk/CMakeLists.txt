@@ -22,28 +22,13 @@ endif()
 
 set(CMAKE_DEBUG_POSTFIX "d")
 
+#################
+# Plugins
 
-###############
-# Link with DART
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_INSTALL_PREFIX}/share/dart")
-
-find_package(DARTExt REQUIRED)
-find_package(DART REQUIRED)
-
-include_directories(${DARTExt_INCLUDEDIR})
-include_directories(${DART_INCLUDEDIR})
-#include_directories( /home/yan/Course/Robotics/vrc-golem/dart-atlas/src . )
-include_directories( /home/ana/Research/HUBO/vrc-golem/dart-atlas/src . )
-
-link_directories(${DART_LIBRARY_DIRS})
-#link_directories( /home/yan/Course/Robotics/vrc-golem/dart-atlas/lib )
-link_directories(/home/ana/Research/HUBO/vrc-golem/dart-atlas/lib )
-
-# Add plugin
-#rosbuild_add_executable( walk  walk.cpp zmp/zmpUtilities.cpp )
+# Add plugin that works with DRCSim 2.2
 rosbuild_add_executable( publish_and_readonce publish_and_readonce.cpp zmp/zmpUtilities.cpp )
-rosbuild_add_executable( johnnieWalker johnnieWalker.cpp zmp/zmpUtilities.cpp )
-
-#target_link_libraries( walk ${DART_LIBRARIES} ${DARTExt_LIBRARIES} dart_atlas )
 target_link_libraries( publish_and_readonce ${DART_LIBRARIES} ${DARTExt_LIBRARIES} dart_atlas )
+
+# Plugin that works in DRCSim 2.5 and is cleaner
+rosbuild_add_executable( johnnieWalker johnnieWalker.cpp zmp/zmpUtilities.cpp )
 target_link_libraries( johnnieWalker ${DART_LIBRARIES} ${DARTExt_LIBRARIES} dart_atlas )
