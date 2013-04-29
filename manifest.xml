@@ -1,16 +1,17 @@
 <package>
-  <description brief="ZMPWalker">
+  <description brief="ROSZMPWalker">
 
      ZMPWalker
 
   </description>
-  <author>yan</author>
+  <author>Eric Huang, Xinyan Yan and Ana Huaman (plus some code based on Matt's Zucker hubomz)</author>
   <license>BSD</license>
   <review status="unreviewed" notes=""/>
   <url>http://ros.org/wiki/ZMPWalker</url>
   <depend package="roscpp"/>
   <depend package="trajectory_msgs"/>
   <depend package="osrf_msgs"/>
+  <depend package="atlas_msgs" />	
 
 </package>
 

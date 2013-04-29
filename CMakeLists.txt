@@ -1,8 +1,6 @@
 cmake_minimum_required(VERSION 2.4.6)
 include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
 
-
-
 ###############
 # Compile flags
 if(WIN32)
@@ -14,7 +12,7 @@ if(WIN32)
   set (CMAKE_EXE_LINKER_FLAGS "/LTCG")
   set (CMAKE_MODULE_LINKER_FLAGS "/LTCG")
 else ()
-  set(CMAKE_INSTALL_PREFIX /usr )
+  set(CMAKE_INSTALL_PREFIX /usr/local )
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse2 -std=c++0x")
   set(CMAKE_CXX_FLAGS_RELEASE "-O3")
   set(CMAKE_CXX_FLAGS_DEBUG "-g -fno-omit-frame-pointer -fno-inline-functions -fno-inline-functions-called-once -fno-optimize-sibling-calls")
@@ -23,9 +21,6 @@ else ()
 endif()
 
 set(CMAKE_DEBUG_POSTFIX "d")
-
-
-
 
 # Set the build type.  Options are:
 #  Coverage       : w/ debug symbols, w/o optimization, w/ code-coverage
@@ -36,8 +31,6 @@ set(CMAKE_DEBUG_POSTFIX "d")
 #set(ROS_BUILD_TYPE RelWithDebInfo)
 
 rosbuild_init()
-
-
 
 #set the default path for built executables to the "bin" directory
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
@@ -70,8 +63,6 @@ include_directories( ${GAZEBO_INCLUDE_DIRS} )
 link_directories( ${GAZEBO_LIBRARY_DIRS} ) 
 
 
-
-
 ###############
 # Link with DART
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_INSTALL_PREFIX}/share/dart")
@@ -79,29 +70,28 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_INSTALL_PREFIX}/share/dart")
 find_package(DARTExt REQUIRED)
 find_package(DART REQUIRED)
 
-include_directories(${DARTExt_INCLUDEDIR})
-include_directories(${DART_INCLUDEDIR})
-include_directories( /home/eric/ros/vrc-golem/dart-atlas/src . )
-include_directories(/home/eric/ros/ROSZMPWalker/src)
 
-link_directories(${DART_LIBRARY_DIRS})
-link_directories( /home/eric/ros/vrc-golem/dart-atlas/lib )
-link_directories( /home/eric/golems/dart/lib)
+######################
+# Set vrc-golem path
+#set( VRC_GOLEM_PATH /home/eric/ros/vrc-golem )
+set( VRC_GOLEM_PATH /home/ana/Software/DG_LAB/vrc-golem )
+
+include_directories( ${DARTExt_INCLUDEDIR} )
+include_directories( ${DART_INCLUDEDIR} )
+include_directories( ${VRC_GOLEM_PATH}/dart-atlas/src . )
+include_directories( ${CMAKE_SOURCE_DIR}/src)
+
+link_directories( ${DART_LIBRARY_DIRS} )
+link_directories( ${VRC_GOLEM_PATH}/dart-atlas/lib )
 
 
 # Eigen
 include_directories( /usr/local/include/eigen3/ )
 
-rosbuild_add_executable( publish_joint_commands src/publish_joint_commands.cpp )
-rosbuild_add_executable( publish_joint_command_fromTxt src/publish_joint_commands_fromTxt.cpp )
-#rosbuild_add_executable( publish_and_readonce src/publish_and_readonce.cpp )
-rosbuild_add_executable( subscribe_jointStates_test src/subscribe_jointStates_test.cpp )
-rosbuild_add_executable( test_keyframes src/test_keyframes.cpp )
-
-# Eric
+# Eric code
 rosbuild_add_executable( zmp_walk src/zmp/zmp_walk.cpp src/walk/zmp/zmpUtilities.cpp src/zmp/main.cpp)
 target_link_libraries( zmp_walk dart_atlas ${DART_LIBRARIES} ${DARTExt_LIBRARIES})
 
-# Walk
+# Ana and Xinyan's code
 add_subdirectory( src/walk )
 
