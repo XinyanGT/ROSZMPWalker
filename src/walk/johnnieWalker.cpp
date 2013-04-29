@@ -154,9 +154,9 @@ int main( int argc, char** argv ) {
   double strong_kp = 20;
   double weak_kp = 20;
 
-  double default_ki = 1.3;
+  double default_ki = 1.2; // 1.3;
   double strong_ki = 1.3;
-  double weak_ki = 1.3;
+  double weak_ki = 1.1; //1.3;
 
   Eigen::VectorXd double_support_kp, double_support_ki;
   Eigen::VectorXd left_support_kp, left_support_ki;

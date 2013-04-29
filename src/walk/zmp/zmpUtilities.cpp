@@ -541,7 +541,6 @@ void zmpUtilities::generateCOMPositions( ) {
   printf("[COM Calculation] zmp size: %d n: %d \n", mZMP.size(), mN );
   printf("Calculating from i: %d to i: %d \n", 0, mZMP.size() - mN - 1 );
   for( int i = 0; i < mZMP.size() - mN - 1; ++i ) {
-    if( i % 100 == 0) { printf("i: %d \n", i); }
     x = mA*x + mB*u;
     y = mC*x;
 
