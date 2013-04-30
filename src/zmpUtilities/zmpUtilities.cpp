@@ -97,6 +97,177 @@ void zmpUtilities::setParameters( const double &_dt,
 }
 
 
+/** Generate zmp x and y positions for a straight walk */
+void zmpUtilities::generateZmpPositions2( int _numSteps,
+					  const bool &_startLeftFoot,
+					  const double &_stepLength,
+					  const double &_footSeparation,
+					  const double &_stepDuration,
+					  const double &_slopeTime,
+					  const double &_levelTime,
+					  const int &_numWaitSteps,
+					  const double &_comZ ) {
+
+  // Set the variables
+  mStepLength = _stepLength;
+  mFootSeparation = _footSeparation;
+  mStepDuration = _stepDuration;
+
+  // Variables
+  double walk_dist = 1.0;
+
+  double foot_separation_y = _footSeparation / 2.0; // half of total separation
+  double foot_liftoff_z = 0.05;
+
+  double step_length = mStepLength; // Total step 2X
+  bool walk_sideways = false;
+
+  double com_height = _comZ;
+  double com_ik_ascl = 0;
+
+  
+  double zmpoff_y = 0; // lateral displacement between zmp and ankle
+  double zmpoff_x = 0;
+
+  double lookahead_time = 1*_stepDuration; 
+  double startup_time = _numWaitSteps*_stepDuration;
+  double shutdown_time = _numWaitSteps*_stepDuration;
+  double double_support_time = _slopeTime;
+  double single_support_time = _levelTime;
+
+  size_t max_step_count = 20;
+  double zmp_jerk_penalty = 1e-8; // jerk penalty on ZMP controller
+  
+  ZMPWalkGenerator::ik_error_sensitivity ik_sense = ZMPWalkGenerator::ik_strict;
+  
+
+  //////////////////////////////////////////////////////////////////////
+  // build initial state
+
+  // the actual state
+  ZMPWalkGenerator walker(ik_sense,
+                          com_height,
+                          zmp_jerk_penalty,
+			  zmpoff_x,
+			  zmpoff_y,
+                          com_ik_ascl,
+                          single_support_time,
+                          double_support_time,
+                          startup_time,
+                          shutdown_time,
+                          foot_liftoff_z,
+			  lookahead_time);
+  printf("COM Height: %f single st: %f double st: %f startup time: %f, shutdown time: %f foot liftoff: %f lookahead: %f \n", com_height, single_support_time,
+	 double_support_time, startup_time, shutdown_time, foot_liftoff_z, lookahead_time );
+  ZMPReferenceContext initContext;
+  
+  // helper variables and classes
+  double deg = M_PI/180; // for converting from degrees to radians
+  
+  // fill in the kstate
+  //initContext.state.body_pos = vec3(0, 0, 0.85);
+  //initContext.state.body_rot = quat();
+  
+  // build and fill in the initial foot positions
+  Transform3 starting_location(quat::fromAxisAngle(vec3(0,0,1), 0));
+  initContext.feet[0] = Transform3(starting_location.rotation(), starting_location * vec3(0, foot_separation_y, 0));
+  initContext.feet[1] = Transform3(starting_location.rotation(), starting_location * vec3(0, -foot_separation_y, 0));
+  
+  // fill in the rest
+  initContext.stance = DOUBLE_LEFT;
+  initContext.comX = Eigen::Vector3d(zmpoff_x, 0.0, 0.0);
+  initContext.comY = Eigen::Vector3d(0.0, 0.0, 0.0);
+  initContext.eX = 0.0;
+  initContext.eY = 0.0;
+  initContext.pX = 0.0;
+  initContext.pY = 0.0;
+  
+  // apply COM IK for init context
+  //walker.applyComIK(initContext);
+  
+  walker.traj.resize(1);
+  walker.refToTraj(initContext, walker.traj.back());
+  
+  walker.initialize(initContext);
+
+  
+  //////////////////////////////////////////////////////////////////////
+  // build ourselves some footprints
+  
+  Footprint initLeftFoot = Footprint(initContext.feet[0], true);
+  /* Footprint initRightFoot = Footprint(initContext.feet[1], false); */
+
+  std::vector<Footprint> footprints;    
+    
+  footprints = walkLine(walk_dist, foot_separation_y,
+			step_length,
+			initLeftFoot);
+  printf("Size footprint: %d \n", footprints.size());
+  
+  if (footprints.size() > max_step_count) {
+    footprints.resize(max_step_count);
+  }
+
+  //////////////////////////////////////////////////////////////////////
+  // and then build up the walker
+  printf("Size walk ref before startup: %d \n", walker.ref.size() );
+  walker.stayDogStay(startup_time * TRAJ_FREQ_HZ);
+    printf("Size walk ref after startup: %d \n", walker.ref.size() );
+  for(std::vector<Footprint>::iterator it = footprints.begin(); it != footprints.end(); it++) {
+    walker.addFootstep(*it);
+  }
+  printf("Size walk ref after steps: %d \n", walker.ref.size() );
+  walker.stayDogStay(shutdown_time * TRAJ_FREQ_HZ);
+   printf("Size walk ref after shutdown: %d \n", walker.ref.size() );
+  printf("FREQ: %d \n", TRAJ_FREQ_HZ);
+  printf("Num traj points: %d \n", walker.ref.size() );
+
+  // Store
+  // Store ZMP, Left foot, right foot and Support Mode
+  Eigen::Vector2d zmp;
+  Eigen::Vector3d leftFoot;
+  Eigen::Vector3d rightFoot;
+  int support;
+/*
+  mZMPT.resize(0);
+  mLeftFootT.resize(0);
+  mRightFootT.resize(0);
+  mSupportModeT.resize(0);
+
+  for( int i = 0; i < walker.ref.size(); ++i ) {
+    zmp << walker.ref[i].pX, walker.ref[i].pY;
+    leftFoot << walker.ref[i].feet[0].matrix()(0,3), walker.ref[i].feet[0].matrix()(1,3), walker.ref[i].feet[0].matrix()(2,3);
+    rightFoot << walker.ref[i].feet[1].matrix()(0,3), walker.ref[i].feet[1].matrix()(1,3), walker.ref[i].feet[1].matrix()(2,3);
+    support << walker.ref[i].stance;
+    
+    mZMPT.push_back( zmp );
+    mLeftFootT.push_back( leftFoot );
+    mRightFootT.push_back( rightFoot );
+    mSupportModeT.push_back( support );
+
+  }
+  */
+
+  mZMP.resize(0);
+  mLeftFoot.resize(0);
+  mRightFoot.resize(0);
+  mSupportMode.resize(0);
+
+  for( int i = 0; i < walker.ref.size(); ++i ) {
+    zmp << walker.ref[i].pX, walker.ref[i].pY;
+    leftFoot << walker.ref[i].feet[0].matrix()(0,3), walker.ref[i].feet[0].matrix()(1,3), walker.ref[i].feet[0].matrix()(2,3);
+    rightFoot << walker.ref[i].feet[1].matrix()(0,3), walker.ref[i].feet[1].matrix()(1,3), walker.ref[i].feet[1].matrix()(2,3);
+    support << walker.ref[i].stance;
+    
+    mZMP.push_back( zmp );
+    mLeftFoot.push_back( leftFoot );
+    mRightFoot.push_back( rightFoot );
+    mSupportMode.push_back( support );
+
+  }
+
+}
+
 
 /**
  * @function getControllerGains

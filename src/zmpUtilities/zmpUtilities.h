@@ -31,7 +31,7 @@ class zmpUtilities {
   
   void setParameters( const double &_dt,
 		      const double &_g,
-          const Eigen::VectorXd &_initDofs ); 
+		      const Eigen::VectorXd &_initDofs ); 
 
   /** Generate zmp x and y positions for a straight walk */
   void generateZmpPositions( int _numSteps = 5,
@@ -41,7 +41,19 @@ class zmpUtilities {
 			     const double &_stepDuration = 1.0,
 			     const double &_slopeTime = 0.15,
 			     const double &_levelTime = 0.85,
-			     const int &_numWaitSteps = 1 );
+			     const int &_numWaitSteps = 1,
+			     const double &_stepHeight = 0.0 );
+
+  /** Generate zmp x and y positions for a straight walk */
+  void generateZmpPositions2( int _numSteps = 5,
+			      const bool &_startLeftFoot = true,
+			      const double &_stepLength = 0.1,
+			      const double &_footSeparation = 0.282,
+			      const double &_stepDuration = 1.0,
+			      const double &_slopeTime = 0.15,
+			      const double &_levelTime = 0.85,
+			      const int &_numWaitSteps = 1,
+			      const double &_zcom = 0.8438 );
   
   /** Generate a nice step function with spline blendings between transitions */
   std::vector<double> generateSmoothPattern( const double &_x0,
@@ -70,7 +82,8 @@ class zmpUtilities {
   void generateSwingPattern( std::vector<Eigen::VectorXd> &_footPos,
 			     const double &_x0, const double &_xf,
 			     const double &_y0, const double &_yf,
-			     const int &_numPts );
+			     const int &_numPts,
+			     const double &_stepHeight = 0 );
    
   /** Prepare Atlas (what does this mean? */
   atlas::AtlasKinematics* prepareAtlasKinematics(); 
@@ -133,6 +146,10 @@ class zmpUtilities {
   std::vector<Eigen::VectorXd> mRightLeg;
   Eigen::VectorXd mInitDofVals;
 
+  std::vector<Eigen::VectorXd> mZMPT;
+  std::vector<Eigen::VectorXd> mLeftFootT;
+  std::vector<Eigen::VectorXd> mRightFootT;
+  std::vector<int> mSupportModeT;
 };
 
 
