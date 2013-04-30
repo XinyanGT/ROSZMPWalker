@@ -32,8 +32,8 @@ void swingSimpleCycloid( double _x0, double _y0, double _theta0,
 			 int _count, 
 			 bool _isLeft,
                          double _maxheight,
-			 double _pos[N][3],
-			 double _yaw[N] ) {
+			 double _pos[][3],
+			 double _yaw[] ) {
   
     double d, r;
     double a, cos_a, sin_a;
@@ -81,8 +81,8 @@ void swingEllipse( double _x0, double _y0, double _theta0,
                    int _count, 
                    bool _isLeft,
                    double _maxheight,
-                   double _pos[N][3],
-                   double _yaw[N] ) {
+                   double _pos[][3],
+                   double _yaw[] ) {
 
     double a, b;  
     double t, t0, t1, dt;
@@ -140,8 +140,8 @@ void swing2Cycloids( double _x0, double _y0, double _theta0,
 		     int _count, 
 		     bool _isLeft,
                      double _maxheight,
-		     double _pos[N][3],
-		     double _yaw[N] ) {
+		     double _pos[][3],
+		     double _yaw[] ) {
   
     // Vertical movement parameters
     int m = 0.1*_count; // 0.1 is the % of steps used to do the vertical step.
@@ -215,8 +215,8 @@ void swingSimpleBezier( double _x0, double _y0, double _theta0,
 			int _count, 
 			bool _isLeft,
                         double _maxheight,
-			double _pos[N][3],
-			double _yaw[N] ) {
+			double _pos[][3],
+			double _yaw[] ) {
 
     // Control location of 2 Bezier control points (p1 and p2)
     double control_percentage = 0.1;
@@ -281,8 +281,8 @@ void swingEllipse2( double _x0, double _y0, double _theta0,
                     double _x1, double _y1, double _theta1,
                     int _count, 
                     bool _isLeft,
-                    double _pos[N][3],
-                    double _yaw[N] ) {
+                    double _pos[][3],
+                    double _yaw[] ) {
 
     double a, b;  
     double t, t0, t1, dt;

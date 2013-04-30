@@ -5,9 +5,6 @@
  */
 #include <stdio.h>
 
-// Hard-coded in a galaxy far, far away...
-int const N = 600;
-
 /**< Utility function */
 void getSpline3( double _tf, double _x0, double _xf, double _dx0, double _dxf,
                  double &_a0, double &_a1, double &_a2, double &_a3 );
@@ -19,8 +16,8 @@ void swingSimpleCycloid( double _x0, double _y0, double _z0,
                          int _count,
                          bool _isLeft,
 			 double _maxheight,
-                         double _pos[N][3],
-                         double _yaw[N] );
+                         double _pos[][3],
+                         double _yaw[] );
 
 /** < Ellipse shape, yaw linearly */
 void swingEllipse( double _x0, double _y0, double _z0,
@@ -28,8 +25,8 @@ void swingEllipse( double _x0, double _y0, double _z0,
                    int _count,
                    bool _isLeft,
                    double _maxheight,
-                   double _pos[N][3],
-                   double _yaw[N] );
+                   double _pos[][3],
+                   double _yaw[] );
 
 
 /** < Ellipse shape, with velocity of x, y, z starting from zero, yaw linearly */
@@ -37,8 +34,8 @@ void swingEllipse2( double _x0, double _y0, double _z0,
                     double _x1, double _y1, double _z1,
                     int _count, 
                     bool _isLeft,
-                    double _pos[N][3],
-                    double _yaw[N] );
+                    double _pos[][3],
+                    double _yaw[] );
 
 /**< 2 Cycloids, one for x,y, the other for z. Yaw changes as spline */
 void swing2Cycloids( double _x0, double _y0, double _theta0,
@@ -46,8 +43,8 @@ void swing2Cycloids( double _x0, double _y0, double _theta0,
                      int _count, 
                      bool _isLeft,
                      double _maxheight,
-                     double _pos[N][3],
-                     double _yaw[N] );
+                     double _pos[][3],
+                     double _yaw[] );
 
 /**< Simple Bezier in plane xy (2 additional points in yaw directions to guide the curvature) and cycloid in z as usual */
 void swingSimpleBezier( double _x0, double _y0, double _theta0,
@@ -55,5 +52,5 @@ void swingSimpleBezier( double _x0, double _y0, double _theta0,
                         int _count, 
                         bool _isLeft,
 			double _maxheight,
-                        double _pos[N][3],
-                        double _yaw[N] );
+                        double _pos[][3],
+                        double _yaw[] );
