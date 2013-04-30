@@ -697,62 +697,63 @@ void MoveJointTractoryAdv( atlas::AtlasKinematics *AK,
   for (int i = 0; i < _zmp.size(); i++) {
     switch (supportInfo[i]) {
 
-      case DOUBLE_SUPPORT:
-
-        for (int j = 0; j < 4; j++) {
-          gAtlasCommand.position[j] = _zmp[i](j);
-          gAtlasCommand.kp_position[j] = gAtlasCommand_saved.kp_position[j] * double_support_kp(j);
-          gAtlasCommand.kd_position[j] = gAtlasCommand_saved.kd_position[j] * double_support_ki(j);
-        }
-
-        for (int j = 0; j < atlas::NUM_MANIPULATORS; j++) {
-          for (int k = 0; k < 6; k++) {
-            gAtlasCommand.position[j*6+k+4] = _zmp[i](j*6+k+4);
-            gAtlasCommand.kp_position[j*6+k+4] = gAtlasCommand_saved.kp_position[j*6+k+4] * 
-	      double_support_kp(j*6+k+4);
+    case DOUBLE_LEFT:
+    case DOUBLE_RIGHT:
+      
+      for (int j = 0; j < 4; j++) {
+	gAtlasCommand.position[j] = _zmp[i](j);
+	gAtlasCommand.kp_position[j] = gAtlasCommand_saved.kp_position[j] * double_support_kp(j);
+	gAtlasCommand.kd_position[j] = gAtlasCommand_saved.kd_position[j] * double_support_ki(j);
+      }
+      
+      for (int j = 0; j < atlas::NUM_MANIPULATORS; j++) {
+	for (int k = 0; k < 6; k++) {
+	  gAtlasCommand.position[j*6+k+4] = _zmp[i](j*6+k+4);
+	  gAtlasCommand.kp_position[j*6+k+4] = gAtlasCommand_saved.kp_position[j*6+k+4] * 
+	    double_support_kp(j*6+k+4);
             gAtlasCommand.kd_position[j*6+k+4] = gAtlasCommand_saved.kd_position[j*6+k+4] * 
 	      double_support_ki(j*6+k+4);
-          }
-        }
-        if( gJohnnieDebug ) std::cout << "DOUBLE_SUPPORT: " << double_support_kp.transpose() << std::endl;
-        break;
-	
-      case LEFT_SUPPORT:
-        for (int j = 0; j < 4; j++) {
-          gAtlasCommand.position[j] = _zmp[i](j);
-          gAtlasCommand.kp_position[j] = gAtlasCommand_saved.kp_position[j] * left_support_kp(j);
-          gAtlasCommand.kd_position[j] = gAtlasCommand_saved.kd_position[j] * left_support_ki(j);
-        }
-        for (int j = 0; j < atlas::NUM_MANIPULATORS; j++) {
-          for (int k = 0; k < 6; k++) {
-            gAtlasCommand.position[j*6+k+4] = _zmp[i](j*6+k+4);
-            gAtlasCommand.kp_position[j*6+k+4] = gAtlasCommand_saved.kp_position[j*6+k+4] * 
-                                                  left_support_kp(j*6+k+4);
-            gAtlasCommand.kd_position[j*6+k+4] = gAtlasCommand_saved.kd_position[j*6+k+4] * 
-	      left_support_ki(j*6+k+4);
-          }
-        }
-	if( gJohnnieDebug ) { std::cout << "LEFT_SUPPORT: " << left_support_kp.transpose() << std::endl; }
-	break;
-	
-      case RIGHT_SUPPORT:
-        for (int j = 0; j < 4; j++) {
-          gAtlasCommand.position[j] = _zmp[i](j);
-          gAtlasCommand.kp_position[j] = gAtlasCommand_saved.kp_position[j] * right_support_kp(j);
-          gAtlasCommand.kd_position[j] = gAtlasCommand_saved.kd_position[j] * right_support_ki(j);
-        }
-        for (int j = 0; j < atlas::NUM_MANIPULATORS; j++) {
-          for (int k = 0; k < 6; k++) {
-            gAtlasCommand.position[j*6+k+4] = _zmp[i](j*6+k+4);
-            gAtlasCommand.kp_position[j*6+k+4] = gAtlasCommand_saved.kp_position[j*6+k+4] * 
-                                                  right_support_kp(j*6+k+4);
-            gAtlasCommand.kd_position[j*6+k+4] = gAtlasCommand_saved.kd_position[j*6+k+4] * 
-                                                  right_support_ki(j*6+k+4);
-          }
-        }
-	if( gJohnnieDebug ) { std::cout << "RIGHT_SUPPORT: " << right_support_kp.transpose() << std::endl; }
-	break;
-	
+	}
+      }
+      if( gJohnnieDebug ) std::cout << "DOUBLE_SUPPORT: " << double_support_kp.transpose() << std::endl;
+      break;
+      
+    case SINGLE_LEFT:
+      for (int j = 0; j < 4; j++) {
+	gAtlasCommand.position[j] = _zmp[i](j);
+	gAtlasCommand.kp_position[j] = gAtlasCommand_saved.kp_position[j] * left_support_kp(j);
+	gAtlasCommand.kd_position[j] = gAtlasCommand_saved.kd_position[j] * left_support_ki(j);
+      }
+      for (int j = 0; j < atlas::NUM_MANIPULATORS; j++) {
+	for (int k = 0; k < 6; k++) {
+	  gAtlasCommand.position[j*6+k+4] = _zmp[i](j*6+k+4);
+	  gAtlasCommand.kp_position[j*6+k+4] = gAtlasCommand_saved.kp_position[j*6+k+4] * 
+	    left_support_kp(j*6+k+4);
+	  gAtlasCommand.kd_position[j*6+k+4] = gAtlasCommand_saved.kd_position[j*6+k+4] * 
+	    left_support_ki(j*6+k+4);
+	}
+      }
+      if( gJohnnieDebug ) { std::cout << "LEFT_SUPPORT: " << left_support_kp.transpose() << std::endl; }
+      break;
+      
+    case SINGLE_RIGHT:
+      for (int j = 0; j < 4; j++) {
+	gAtlasCommand.position[j] = _zmp[i](j);
+	gAtlasCommand.kp_position[j] = gAtlasCommand_saved.kp_position[j] * right_support_kp(j);
+	gAtlasCommand.kd_position[j] = gAtlasCommand_saved.kd_position[j] * right_support_ki(j);
+      }
+      for (int j = 0; j < atlas::NUM_MANIPULATORS; j++) {
+	for (int k = 0; k < 6; k++) {
+	  gAtlasCommand.position[j*6+k+4] = _zmp[i](j*6+k+4);
+	  gAtlasCommand.kp_position[j*6+k+4] = gAtlasCommand_saved.kp_position[j*6+k+4] * 
+	    right_support_kp(j*6+k+4);
+	  gAtlasCommand.kd_position[j*6+k+4] = gAtlasCommand_saved.kd_position[j*6+k+4] * 
+	    right_support_ki(j*6+k+4);
+	}
+      }
+      if( gJohnnieDebug ) { std::cout << "RIGHT_SUPPORT: " << right_support_kp.transpose() << std::endl; }
+      break;
+      
     }
     if( gJohnnieDebug ) std::cout << "JOINT_KP:";
     for (int i = 0; i < 28; i++)

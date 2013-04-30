@@ -17,13 +17,6 @@
 // For tinyWalker
 #include "tinyWalker/zmp/zmpwalkgenerator.h"
 
-enum SUPPORT_MODES {
-  DOUBLE_SUPPORT = 0,
-  LEFT_SUPPORT,
-  RIGHT_SUPPORT
-};
-
-
 /**
  * @class zmpUtilities
  */
