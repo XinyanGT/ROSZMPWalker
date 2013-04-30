@@ -88,10 +88,5 @@ link_directories( ${VRC_GOLEM_PATH}/dart-atlas/lib )
 # Eigen
 include_directories( /usr/local/include/eigen3/ )
 
-# Eric code
-rosbuild_add_executable( zmp_walk src/zmp/zmp_walk.cpp src/walk/zmp/zmpUtilities.cpp src/zmp/main.cpp)
-target_link_libraries( zmp_walk dart_atlas ${DART_LIBRARIES} ${DARTExt_LIBRARIES})
 
-# Ana and Xinyan's code
-add_subdirectory( src/walk )
-
+add_subdirectory( src )

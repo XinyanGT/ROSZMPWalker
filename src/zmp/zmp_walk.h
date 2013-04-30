@@ -28,7 +28,7 @@
 
 #include <iostream>
 
-#include "walk/zmp/zmpUtilities.h"
+#include "zmpUtilities/zmpUtilities.h"
 
 using namespace std;
 using namespace kinematics;

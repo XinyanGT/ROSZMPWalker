@@ -32,7 +32,7 @@
 #include <iostream>
 #include <getopt.h>
 
-#include "walk/zmp/zmpUtilities.h"
+#include "zmpUtilities/zmpUtilities.h"
 #include "zmp_walk.h"
 
 using namespace std;

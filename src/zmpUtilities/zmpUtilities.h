@@ -14,11 +14,8 @@
 
 #include <atlas/AtlasKinematics.h>
 
-enum SUPPORT_MODES {
-  DOUBLE_SUPPORT = 0,
-  LEFT_SUPPORT,
-  RIGHT_SUPPORT
-};
+// For tinyWalker
+#include "tinyWalker/zmp/zmpwalkgenerator.h"
 
 /**
  * @class zmpUtilities
@@ -36,15 +33,23 @@ class zmpUtilities {
 		      const double &_g,
           const Eigen::VectorXd &_initDofs ); 
 
-  /** Generate zmp x and y positions for a straight walk */
-  void generateZmpPositions( int _numSteps = 5,
-			     const bool &_startLeftFoot = true,
-			     const double &_stepLength = 0.1,
-			     const double &_footSeparation = 0.282,
-			     const double &_stepDuration = 1.0,
-			     const double &_slopeTime = 0.15,
-			     const double &_levelTime = 0.85,
-			     const int &_numWaitSteps = 1 );
+  /** Init walk generator */
+  void initZMPWalkGenerator( const double &_CoMZ = 0.8438,
+					   const double &_singleSupportTime = 0.85,
+					   const double &_doubleSupportTime = 0.1,
+					   const double &_startupTime = 1.0,
+					   const double &_shutdowntime = 1.0,
+					   const double &_previewTime = 2.0,
+					   const double &_footLiftoffZ = 0.05,
+					   const double &_zmpOffX = 0.0,
+					   const double &_zmpOffY = 0.0,
+					   const double &_zmpJerkPenalty = 1e-8,
+					   ZMPWalkGenerator::ik_error_sensitivity _ikSense = ZMPWalkGenerator::ik_strict,
+					   const double &_comIkAscl = 0.0 );
+
+  void generateZmpPositions( double walk_dist, 
+					   double foot_separation_y,
+					   double step_length );
   
   /** Generate a nice step function with spline blendings between transitions */
   std::vector<double> generateSmoothPattern( const double &_x0,
@@ -56,7 +61,7 @@ class zmpUtilities {
   void getControllerGains( const double &_Qe,
 			   const double &_R,
 			   const double &_z_COM,
-			   const int &_numPreviewSteps = 2 );
+			   const double &_previewTime = 2.0 );
   
   /** Solve Discrete Algebraic Riccati equation */
   bool iterative_DARE( Eigen::MatrixXd &_P, 
@@ -88,8 +93,6 @@ class zmpUtilities {
    * Needed ?
    *********************************/
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-
-
   
   // General
   int mN; /**< Num preview steps */
@@ -136,6 +139,9 @@ class zmpUtilities {
   std::vector<Eigen::VectorXd> mRightLeg;
   Eigen::VectorXd mInitDofVals;
 
+  // ZMP Walk Generator
+  ZMPWalkGenerator* mWalker;
+  
 };
 
 #endif /** _UTILITIES_H_ */

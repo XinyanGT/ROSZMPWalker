@@ -37,7 +37,7 @@
 #include <vector>
 
 // Our ZMP library
-#include "zmp/zmpUtilities.h"
+#include "zmpUtilities/zmpUtilities.h"
 
 
 /** FUNCTIONS */

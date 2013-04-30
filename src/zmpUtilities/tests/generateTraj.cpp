@@ -16,7 +16,7 @@ int main( int argc, char* argv[] ) {
   double stepDuration = 1.0;
   double slopeTime = 0.15;
   double levelTime = 0.85;
-  double dt = 0.001;
+  double dt = 0.005;
   double zg = 0.8438;
   int numPreviewSteps = 2;
   double Qe = 10000000;

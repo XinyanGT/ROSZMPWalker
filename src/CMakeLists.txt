@@ -22,13 +22,23 @@ endif()
 
 set(CMAKE_DEBUG_POSTFIX "d")
 
+#################################
+# Compile zmpUtilities library
+add_subdirectory( zmpUtilities )
+
 #################
 # Plugins
+include_directories( . zmpUtilities/tinyWalker )
 
+# Eric code
+#rosbuild_add_executable( zmp_walk zmp/zmp_walk.cpp zmp/main.cpp)
+#target_link_libraries( zmp_walk dart_atlas ${DART_LIBRARIES} ${DARTExt_LIBRARIES})
+
+# Ana and Xinyan's code
 # Add plugin that works with DRCSim 2.2
-rosbuild_add_executable( publish_and_readonce publish_and_readonce.cpp zmp/zmpUtilities.cpp )
-target_link_libraries( publish_and_readonce ${DART_LIBRARIES} ${DARTExt_LIBRARIES} dart_atlas )
+#rosbuild_add_executable( publish_and_readonce publish_and_readonce.cpp )
+#target_link_libraries( publish_and_readonce ${DART_LIBRARIES} ${DARTExt_LIBRARIES} dart_atlas zmpUtilities )
 
 # Plugin that works in DRCSim 2.5 and is cleaner
-rosbuild_add_executable( johnnieWalker johnnieWalker.cpp zmp/zmpUtilities.cpp )
-target_link_libraries( johnnieWalker ${DART_LIBRARIES} ${DARTExt_LIBRARIES} dart_atlas )
+rosbuild_add_executable( johnnieWalker johnnieWalker.cpp )
+target_link_libraries( johnnieWalker ${DART_LIBRARIES} ${DARTExt_LIBRARIES} dart_atlas zmpUtilities )

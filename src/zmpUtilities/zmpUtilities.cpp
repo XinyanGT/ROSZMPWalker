@@ -24,6 +24,8 @@
 #include <fstream>
 #include <string>
 
+// For footstep generation
+#include <tinyWalker/zmp/atlas-zmp.h>
 
 /**
  * @function zmpUtilities
@@ -94,234 +96,117 @@ void zmpUtilities::setParameters( const double &_dt,
   mInitDofVals = _initDofs; // more than 28...
 }
 
+
+
 /**
- * @function generateZmpPositions
+ * @function initZMPWalkGenerator
  */
-void zmpUtilities::generateZmpPositions( int _numSteps,
-					 const bool &_startLeftFoot,
-					 const double &_stepLength,
-					 const double &_footSeparation,
-					 const double &_stepDuration,
-					 const double &_slopeTime,
-					 const double &_levelTime,
-					 const int &_numWaitSteps ) {
-  std::vector<double> temp;
-  double start, end;
-  int numSlopePts, numLevelPts;
-  int numTotalPts;
-  double leftFoot, rightFoot;
-  double supportFoot, swingFoot, tempFoot;
+void zmpUtilities::initZMPWalkGenerator( const double &_CoMZ,
+					 const double &_singleSupportTime,
+					 const double &_doubleSupportTime,
+					 const double &_startupTime,
+					 const double &_shutdownTime,
+					 const double &_previewTime,
+					 const double &_footLiftoffZ,
+					 const double &_zmpOffX,
+					 const double &_zmpOffY,
+					 const double &_zmpJerkPenalty,
+					 ZMPWalkGenerator::ik_error_sensitivity _ikSense,
+					 const double &_comIkAscl ) {
 
-  //-- Prepare the vectors
-  std::vector<double> zmpx, zmpy;
+  // Generate a ZMPWalkGenerator
+  mWalker = new ZMPWalkGenerator( _ikSense,
+				  _CoMZ,
+				  _zmpJerkPenalty,
+				  _zmpOffX,
+				  _zmpOffY,
+				  _comIkAscl,
+				  _singleSupportTime,
+				  _doubleSupportTime,
+				  _startupTime,
+				  _shutdownTime,
+				  _footLiftoffZ,
+				  _previewTime );
+}
+/**
+ * @function generateZmpPositionsTinyWalker
+ */
+void zmpUtilities::generateZmpPositions( double walk_dist,
+					 double foot_separation_y,
+					 double step_length ) {
 
-  //-- Set a few variables
-  mStepLength = _stepLength;
-  mFootSeparation = _footSeparation;
-  mStepDuration = _stepDuration;
+  ZMPReferenceContext initContext;
   
-  numSlopePts = _slopeTime / mdt;
-  numLevelPts = _levelTime / mdt;
-  numTotalPts = numSlopePts + numLevelPts;
-
-  std::vector<Eigen::VectorXd> lf( numTotalPts, Eigen::Vector3d() );
-  std::vector<Eigen::VectorXd> rf( numTotalPts, Eigen::Vector3d() );
-  std::vector<int> support( numTotalPts );
-
-  leftFoot = mFootSeparation / 2.0;
-  rightFoot = -1*mFootSeparation / 2.0;
-
-//-- WAIT TIME START
-	for( int i = 0; i < _numWaitSteps; ++i ) {
-  		//** Generate ZMP x **	
-  		start = 0; end = 0;
-  		temp = generateSmoothPattern( start, end, numSlopePts, numLevelPts );
-  		zmpx.insert( zmpx.end(), temp.begin(), temp.end() );
-
-  		//** Generate ZMP y **
-  		start = 0; end = 0;
-  		temp = generateSmoothPattern( start, end, numSlopePts, numLevelPts );
- 	 	zmpy.insert( zmpy.end(), temp.begin(), temp.end() );
-
-  		//** Generate foot placements **
-
-   	 	// Stay put right
-    	Eigen::Vector3d p; p << 0, rightFoot, 0;
-    	std::fill( rf.begin(), rf.end(), p );
-    	std::fill( support.begin(), support.end(), DOUBLE_SUPPORT );
-
-    	// Stay put left
-    	p << 0, leftFoot, 0;
-    	std::fill( lf.begin(), lf.end(), p );
-    	std::fill( support.begin(), support.end(), DOUBLE_SUPPORT );
+  // helper variables and classes
+  double deg = M_PI/180; // for converting from degrees to radians
   
-  		mRightFoot.insert( mRightFoot.end(), rf.begin(), rf.end() );
- 	 	mLeftFoot.insert( mLeftFoot.end(), lf.begin(), lf.end() );
-  		mSupportMode.insert( mSupportMode.end(), support.begin(), support.end() );
-  	}
+  // build and fill in the initial foot positions
+  Transform3 starting_location(quat::fromAxisAngle(vec3(0,0,1), 0));
+  initContext.feet[0] = Transform3(starting_location.rotation(), starting_location * vec3(0, foot_separation_y, 0));
+  initContext.feet[1] = Transform3(starting_location.rotation(), starting_location * vec3(0, -foot_separation_y, 0));
+  
+  // fill in the rest
+  initContext.stance = DOUBLE_LEFT;
+  initContext.comX = Eigen::Vector3d( mWalker->zmpoff_x, 0.0, 0.0 );
+  initContext.comY = Eigen::Vector3d(0.0, 0.0, 0.0);
+  initContext.eX = 0.0;
+  initContext.eY = 0.0;
+  initContext.pX = 0.0;
+  initContext.pY = 0.0;
+  
+  mWalker->traj.resize(1);
+  mWalker->refToTraj(initContext, mWalker->traj.back());
+  
+  mWalker->initialize(initContext);
+  
+  //////////////////////////////////////////////////////////////////////
+  // build ourselves some footprints
+  
+  Footprint initLeftFoot = Footprint(initContext.feet[0], true);
+  /* Footprint initRightFoot = Footprint(initContext.feet[1], false); */
+  
+  std::vector<Footprint> footprints;
+  footprints = walkLine( walk_dist, 
+			 foot_separation_y,
+			 step_length,
+			 initLeftFoot);
+  
+  //////////////////////////////////////////////////////////////////////
+  // and then build up the walker
+  mWalker->stayDogStay( mWalker->walk_startup_time * TRAJ_FREQ_HZ );
 
-  //-- Start
-  if( _startLeftFoot == true ) {
-    supportFoot = rightFoot;
-    swingFoot = leftFoot;
-  }
-  else {
-    supportFoot = leftFoot;
-    swingFoot = rightFoot;
-  }
-
-
-  //-- First step
-  //** Generate ZMP x **
-  start = 0; end = (1 - 1)*mStepLength;
-  temp = generateSmoothPattern( start, end, numSlopePts, numLevelPts );
-  zmpx.insert( zmpx.end(), temp.begin(), temp.end() );
-
-  //** Generate ZMP y **
-  start = 0; end = supportFoot;
-  temp = generateSmoothPattern( start, end, numSlopePts, numLevelPts );
-  zmpy.insert( zmpy.end(), temp.begin(), temp.end() );
-
-  //** Generate foot placements **
-  if( supportFoot == leftFoot ) {
-    // Swing right
-    generateSwingPattern( rf, 
-			  0, 1*mStepLength,
-			  rightFoot, rightFoot,
-			  numTotalPts );
-    // Stay put left
-    Eigen::Vector3d p; p << (1-1)*mStepLength, leftFoot, 0;
-    std::fill( lf.begin(), lf.end(), p );
-    std::fill( support.begin(), support.end(), LEFT_SUPPORT );
-    std::fill( support.begin(), support.begin() + numSlopePts, DOUBLE_SUPPORT );
+  for(std::vector<Footprint>::iterator it = footprints.begin(); it != footprints.end(); it++) {
+    mWalker->addFootstep(*it);
   }
   
-  else { 
-    // Swing left
-    generateSwingPattern( lf, 
-			  0, 1*mStepLength,
-			  leftFoot, leftFoot,
-			  numTotalPts );
-    // Stay put right
-    Eigen::Vector3d p; p << (1-1)*mStepLength, rightFoot, 0;
-    std::fill( rf.begin(), rf.end(), p );
-    std::fill( support.begin(), support.end(), RIGHT_SUPPORT );
-    std::fill( support.begin(), support.begin() + numSlopePts, DOUBLE_SUPPORT );
-  }
+  mWalker->stayDogStay( mWalker->walk_shutdown_time * TRAJ_FREQ_HZ );
   
-  mRightFoot.insert( mRightFoot.end(), rf.begin(), rf.end() );
-  mLeftFoot.insert( mLeftFoot.end(), lf.begin(), lf.end() );
-  mSupportMode.insert( mSupportMode.end(), support.begin(), support.end() );
-  
-  // Switch feet
-  tempFoot = supportFoot;
-  supportFoot = swingFoot;
-  swingFoot = tempFoot;
+  printf("FREQ: %d \n", TRAJ_FREQ_HZ);
+  printf("Num traj points: %d \n", mWalker->ref.size() );
 
-  //-- From step 2 to (N -1)
-  for( unsigned int i = 2; i <= _numSteps - 1; ++i ) {
-
-    //** Generate ZMP x **
-    start = (i-2)*mStepLength; end = (i-1)*mStepLength;
-    temp = generateSmoothPattern( start, end, numSlopePts, numLevelPts );
-    zmpx.insert( zmpx.end(), temp.begin(), temp.end() );
-
-    //** Generate ZMP y **
-    start = swingFoot; end = supportFoot;
-    temp = generateSmoothPattern( start, end, numSlopePts, numLevelPts );
-    zmpy.insert( zmpy.end(), temp.begin(), temp.end() );
-
-    //** Generate foot placements **
-    if( supportFoot == leftFoot ) {
-      // Swing right
-      generateSwingPattern( rf, 
-			    (i-2)*mStepLength, i*mStepLength,
-			    rightFoot, rightFoot,
-			    numTotalPts );
-      // Stay put left
-      Eigen::Vector3d p; p << (i-1)*mStepLength, leftFoot, 0;
-      std::fill( lf.begin(), lf.end(), p );
-      std::fill( support.begin(), support.end(), LEFT_SUPPORT );
-    std::fill( support.begin(), support.begin() + numSlopePts, DOUBLE_SUPPORT );
-    }
-
-    else { 
-      // Swing left
-      generateSwingPattern( lf, 
-			    (i-2)*mStepLength, i*mStepLength,
-			    leftFoot, leftFoot,
-			    numTotalPts );
-      // Stay put right
-      Eigen::Vector3d p; p << (i-1)*mStepLength, rightFoot, 0;
-      std::fill( rf.begin(), rf.end(), p );
-      std::fill( support.begin(), support.end(), RIGHT_SUPPORT );
-    std::fill( support.begin(), support.begin() + numSlopePts, DOUBLE_SUPPORT );
-    }
-
-    mRightFoot.insert( mRightFoot.end(), rf.begin(), rf.end() );
-    mLeftFoot.insert( mLeftFoot.end(), lf.begin(), lf.end() );
-    mSupportMode.insert( mSupportMode.end(), support.begin(), support.end() );
-
-    // Switch feet
-    tempFoot = supportFoot;
-    supportFoot = swingFoot;
-    swingFoot = tempFoot;
-  } 
-
-  //-- Last step
-  // ** Generate ZMP x **
-  start = (_numSteps - 2)*mStepLength; end = (_numSteps - 1)*mStepLength;
-  temp = generateSmoothPattern( start, end, numSlopePts, numLevelPts );
-  zmpx.insert( zmpx.end(), temp.begin(), temp.end() );
-
-  // ** Generate ZMP y **
-  start = swingFoot; end = 0;
-  temp = generateSmoothPattern( start, end, numSlopePts, numLevelPts );
-  zmpy.insert( zmpy.end(), temp.begin(), temp.end() );
-
-  //** Generate foot placements **
-  if( supportFoot == leftFoot ) {
-    // Swing right
-    generateSwingPattern( rf, 
-			  (_numSteps-2)*mStepLength, (_numSteps-1)*mStepLength,
-			  rightFoot, rightFoot,
-			  numTotalPts );
-    // Stay put left
-    Eigen::Vector3d p; p << (_numSteps-1)*mStepLength, leftFoot, 0;
-    std::fill( lf.begin(), lf.end(), p );
-    std::fill( support.begin(), support.end(), LEFT_SUPPORT );
-    std::fill( support.begin(), support.begin() + numSlopePts, DOUBLE_SUPPORT );
-  }
-  
-  else { 
-    // Swing left
-    generateSwingPattern( lf, 
-			  (_numSteps-2)*mStepLength, (_numSteps-1)*mStepLength,
-			  leftFoot, leftFoot,
-			  numTotalPts );
-    // Stay put right
-    Eigen::Vector3d p; p << (_numSteps-1)*mStepLength, rightFoot, 0;
-    std::fill( rf.begin(), rf.end(), p );
-    std::fill( support.begin(), support.end(), RIGHT_SUPPORT );
-    std::fill( support.begin(), support.begin() + numSlopePts, DOUBLE_SUPPORT );
-  }
-  
-  mRightFoot.insert( mRightFoot.end(), rf.begin(), rf.end() );
-  mLeftFoot.insert( mLeftFoot.end(), lf.begin(), lf.end() );
-  mSupportMode.insert( mSupportMode.end(), support.begin(), support.end() );
-
-  // No need to switch feet
-  
-  
-  //-- Store
+  // Store zmp, left and right foot positions
+  mRightFoot.resize(0);
+  mLeftFoot.resize(0);
   mZMP.resize(0);
-  Eigen::MatrixXd zmp(2,1);
-  for( int i = 0; i < zmpy.size(); ++i ) {
-    zmp(0,0) = zmpx[i];
-    zmp(1,0) = zmpy[i];
-    mZMP.push_back( zmp );
-  }
+  mSupportMode.resize(0);
 
+
+  Eigen::Vector2d zmp;
+  Eigen::Vector3d leftFoot, rightFoot;
+  int support;
+
+  for( int i = 0; i < mWalker->ref.size(); ++i ) {
+    zmp << mWalker->ref[i].pX, mWalker->ref[i].pY;
+    leftFoot << mWalker->ref[i].feet[0].matrix()(0,3), mWalker->ref[i].feet[0].matrix()(1,3), mWalker->ref[i].feet[0].matrix()(2,3);
+    rightFoot << mWalker->ref[i].feet[1].matrix()(0,3), mWalker->ref[i].feet[1].matrix()(1,3), mWalker->ref[i].feet[1].matrix()(2,3);
+    support = mWalker->ref[i].stance;
+
+    mZMP.push_back( zmp );
+    mLeftFoot.push_back( leftFoot );
+    mRightFoot.push_back( rightFoot );
+    mSupportMode.push_back( support );
+  }
+  
 }
 
 
@@ -358,7 +243,7 @@ std::vector<double> zmpUtilities::generateSmoothPattern( const double &_x0,
 void zmpUtilities::getControllerGains( const double &_Qe,
 				       const double &_R,
 				       const double &_z_COM,
-				       const int &_numPreviewSteps ) {
+				       const double &_previewTime ) {
 
   // Controller
   Eigen::MatrixXd Qe, Qx, R;
@@ -368,7 +253,7 @@ void zmpUtilities::getControllerGains( const double &_Qe,
   Eigen::MatrixXd _Q, _I, W, K;
 
   //-- Store Num preview steps
-  mN = _numPreviewSteps*( mStepDuration / mdt );
+  mN = _previewTime / mdt;
   mzCOM = _z_COM;
 
   //-- Set dynamics
@@ -716,15 +601,16 @@ void zmpUtilities::getJointTrajectories() {
      * Set mode based on stance
      **************************************/
     switch (mSupportMode[i]) {
-      case DOUBLE_SUPPORT:
+      case DOUBLE_LEFT:
+      case DOUBLE_RIGHT:
         mode[atlas::MANIP_L_FOOT] = atlas::IK_MODE_SUPPORT;
         mode[atlas::MANIP_R_FOOT] = atlas::IK_MODE_SUPPORT;
         break;
-      case LEFT_SUPPORT:
+      case SINGLE_LEFT:
         mode[atlas::MANIP_L_FOOT] = atlas::IK_MODE_SUPPORT;
         mode[atlas::MANIP_R_FOOT] = atlas::IK_MODE_WORLD;
         break;
-      case RIGHT_SUPPORT:
+      case SINGLE_RIGHT:
         mode[atlas::MANIP_L_FOOT] = atlas::IK_MODE_WORLD;
         mode[atlas::MANIP_R_FOOT] = atlas::IK_MODE_SUPPORT;
         break;

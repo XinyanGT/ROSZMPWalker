@@ -31,7 +31,7 @@
 
 #include <iostream>
 
-#include "zmp/zmpUtilities.h"
+#include "zmpUtilities/zmpUtilities.h"
 #include "publish_and_readonce.h"
 
 using namespace std;
