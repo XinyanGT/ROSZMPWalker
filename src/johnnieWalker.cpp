@@ -112,7 +112,7 @@ int main( int argc, char** argv ) {
   leftDelta.setZero();
   rightDelta.setZero();
 
-  //MoveCOMIK( gAK, gAtlasSkel, Twb, Twm, dofs, comDelta, leftDelta, rightDelta, 10, 10, 10, 1.2, 1.2, 1.2, 1000);
+  MoveCOMIK( gAK, gAtlasSkel, Twb, Twm, dofs, comDelta, leftDelta, rightDelta, 10, 10, 10, 1.2, 1.2, 1.2, 1000);
 
 
   /************************************
