@@ -83,9 +83,9 @@ int main( int argc, char** argv ) {
   gAtlasSkel->setPose( dofs, true );
   
   // RELAX ATLAS AND TELL SKEL THE LATEST POSITION AFTER RELAXING
-  //RelaxAtlas( gAK, gAtlasSkel, dofs, 10, 1.2, 1000 );
+  // RelaxAtlas( gAK, gAtlasSkel, dofs, 10, 1.2, 1000 );
   UpdateDofs( dofs );
-  gAtlasSkel->setPose( dofs, true );
+  gAtlasSkel->setPose( dofs, true ); 
 
  
   // ***********************************************
@@ -138,6 +138,7 @@ int main( int argc, char** argv ) {
   double footSeparation = ( gAK->getLimbTransW( gAtlasSkel, Twb, atlas::MANIP_L_FOOT)(1,3) - 
 			    gAK->getLimbTransW( gAtlasSkel, Twb, atlas::MANIP_R_FOOT)(1,3) );
   std::cout << "Foot separation: " << footSeparation << std::endl;
+  double deltaY = 0.02;
   double stepDuration = 5; //3;
   double slopeTime = 1; // move ZMP time
   double levelTime = 4; // keep ZMP time
@@ -210,49 +211,19 @@ int main( int argc, char** argv ) {
   * Generate joint trajectory
   ***************************************/
   gZU.setParameters( dt, 9.81, dofs );
-/*
-  gZU.generateZmpPositions2( numSteps, false,
-			     stepLength, footSeparation,
-			     stepDuration,
-			     slopeTime,
-			     levelTime,
-			     1,
-			     zg );
 
-*/
   gZU.generateZmpPositions( numSteps, true,
 			    stepLength, footSeparation,
 			    stepDuration,
 			    slopeTime,
 			    levelTime,
 			    waitSteps,
-			    stepHeight ); 
-/*
-  gZU.print( "leftFootT.txt", gZU.mLeftFootT );
-  gZU.print( "rightFootT.txt", gZU.mRightFootT );
-  gZU.print( "zmpT.txt", gZU.mZMPT );
-  // gZU.print( "supportModeT.txt", gZU.mSupportModeT );
+			    stepHeight,
+			    deltaY ); 
 
+  
   gZU.print( "leftFoot.txt", gZU.mLeftFoot );
   gZU.print( "rightFoot.txt", gZU.mRightFoot );
-  gZU.print( "zmp.txt", gZU.mZMP );
-  // gZU.print( "supportMode.txt", gZU.mSupportMode );
-  
-  FILE* ps; FILE* pst;
-  pst = fopen( "supportModeT.txt", "w");
-  for( int i = 0; i < gZU.mSupportModeT.size(); ++i ) {
-    fprintf( pst, "%d %d \n", i, gZU.mSupportModeT[i] );
-  }
-  fclose( pst );
-
-  ps = fopen( "supportMode.txt", "w");
-  for( int i = 0; i < gZU.mSupportMode.size(); ++i ) {
-    fprintf( ps, "%d %d \n", i, gZU.mSupportMode[i] );
-  }
-  fclose( ps );
-*/
-
-
 
   gZU.getControllerGains( Qe, R, zg, numPreviewSteps );
   gZU.generateCOMPositions();

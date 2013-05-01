@@ -42,7 +42,8 @@ class zmpUtilities {
 			     const double &_slopeTime = 0.15,
 			     const double &_levelTime = 0.85,
 			     const int &_numWaitSteps = 1,
-			     const double &_stepHeight = 0.0 );
+			     const double &_stepHeight = 0.0,
+			     const double &_zmpDeltaY = 0.0 );
 
   /** Generate zmp x and y positions for a straight walk */
   void generateZmpPositions2( int _numSteps = 5,

@@ -576,6 +576,9 @@ void zmpUtilities::getJointTrajectories() {
      **************************************/
     switch (mSupportMode[i]) {
     case DOUBLE_LEFT:
+      mode[atlas::MANIP_L_FOOT] = atlas::IK_MODE_SUPPORT;
+      mode[atlas::MANIP_R_FOOT] = atlas::IK_MODE_SUPPORT;
+      break;
     case DOUBLE_RIGHT:
       mode[atlas::MANIP_L_FOOT] = atlas::IK_MODE_SUPPORT;
       mode[atlas::MANIP_R_FOOT] = atlas::IK_MODE_SUPPORT;
