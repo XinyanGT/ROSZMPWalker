@@ -79,7 +79,8 @@ int main( int argc, char** argv ) {
   Eigen::VectorXd dofs( gAtlasSkel->getNumDofs() );
   UpdateDofs( dofs );
 
-  if( gJohnnieDebug ) { std::cout << "Joint pose starting: \n"<<dofs.transpose() << std::endl; }
+  // if( gJohnnieDebug ) { 
+  std::cout << "Joint pose starting: \n"<<dofs.transpose() << std::endl; //}
   gAtlasSkel->setPose( dofs, true );
   
   // RELAX ATLAS AND TELL SKEL THE LATEST POSITION AFTER RELAXING
@@ -172,9 +173,9 @@ int main( int argc, char** argv ) {
   right_support_kp.resize(28);
   right_support_ki.resize(28);
   
-
+  // Decrease hip pitch from 40 to 30 (3rd angle)
   left_support_kp << default_kp, default_kp, default_kp, default_kp,
-    strong_kp,  strong_kp, 40, default_kp, 40, strong_kp, 
+    strong_kp,  strong_kp, 30, default_kp, 40, strong_kp, 
     weak_kp, weak_kp, 40, weak_kp, 20, weak_kp,
     default_kp, default_kp, default_kp, default_kp, default_kp, default_kp,
     default_kp, default_kp, default_kp, default_kp, default_kp, default_kp;
@@ -187,7 +188,7 @@ int main( int argc, char** argv ) {
     
   right_support_kp << default_kp, default_kp, default_kp, default_kp,
     weak_kp, weak_kp, 40, weak_kp, 20, weak_kp,
-    strong_kp,  strong_kp, 40, strong_kp, 40, strong_kp, 
+    strong_kp,  strong_kp, 30, default_kp, 40, strong_kp, 
     default_kp, default_kp, default_kp, default_kp, default_kp, default_kp,
     default_kp, default_kp, default_kp, default_kp, default_kp, default_kp;
                 
