@@ -153,8 +153,8 @@ int main( int argc, char** argv ) {
   double Qe = 1e7; // 1
   double R = 10;  // 1e-6
   double default_kp = 20;
-  double strong_kp = 20;
-  double weak_kp = 20;
+  double strong_kp = 25; // may be higher i.e. 30
+  double weak_kp = 15; // 
 
   double default_ki = 1.2; // 1.3;
   double strong_ki = 1.3;
