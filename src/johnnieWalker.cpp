@@ -122,7 +122,7 @@ int main( int argc, char** argv ) {
 
   // Set parameters for ZMP walker
   int numSteps = 30; //30;
-  double stepLength = 0.15; // half step
+  double stepLength = 0.20; // half step
   double stepHeight = 0.05;
   // Update states to get foot separation and CoM height (z)  
   dofs_save = gAtlasSkel->getPose();
@@ -173,9 +173,9 @@ int main( int argc, char** argv ) {
   right_support_kp.resize(28);
   right_support_ki.resize(28);
   
-  // Decrease hip pitch from 40 to 30 (3rd angle)
+
   left_support_kp << default_kp, default_kp, default_kp, default_kp,
-    strong_kp,  strong_kp, 30, default_kp, 40, strong_kp, 
+    strong_kp,  strong_kp, 40, default_kp, 40, strong_kp, 
     weak_kp, weak_kp, 40, weak_kp, 20, weak_kp,
     default_kp, default_kp, default_kp, default_kp, default_kp, default_kp,
     default_kp, default_kp, default_kp, default_kp, default_kp, default_kp;
@@ -188,7 +188,7 @@ int main( int argc, char** argv ) {
     
   right_support_kp << default_kp, default_kp, default_kp, default_kp,
     weak_kp, weak_kp, 40, weak_kp, 20, weak_kp,
-    strong_kp,  strong_kp, 30, default_kp, 40, strong_kp, 
+    strong_kp,  strong_kp, 40, default_kp, 40, strong_kp, 
     default_kp, default_kp, default_kp, default_kp, default_kp, default_kp,
     default_kp, default_kp, default_kp, default_kp, default_kp, default_kp;
                 
