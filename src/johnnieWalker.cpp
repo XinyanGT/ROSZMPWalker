@@ -172,15 +172,9 @@ int main( int argc, char** argv ) {
   right_support_kp.resize(28);
   right_support_ki.resize(28);
   
-  /*
+
   left_support_kp << default_kp, default_kp, default_kp, default_kp,
-    default_kp,  strong_kp, 40, strong_kp, 40, strong_kp, 
-    weak_kp, weak_kp, 40, weak_kp, 20, weak_kp,
-    default_kp, default_kp, default_kp, default_kp, default_kp, default_kp,         
-    default_kp, default_kp, default_kp, default_kp, default_kp, default_kp;
-  */
-  left_support_kp << default_kp, default_kp, default_kp, default_kp,
-    strong_kp,  strong_kp, 40, strong_kp, 40, strong_kp, 
+    strong_kp,  strong_kp, 40, default_kp, 40, strong_kp, 
     weak_kp, weak_kp, 40, weak_kp, 20, weak_kp,
     default_kp, default_kp, default_kp, default_kp, default_kp, default_kp,
     default_kp, default_kp, default_kp, default_kp, default_kp, default_kp;
