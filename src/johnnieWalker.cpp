@@ -139,9 +139,9 @@ int main( int argc, char** argv ) {
 			    gAK->getLimbTransW( gAtlasSkel, Twb, atlas::MANIP_R_FOOT)(1,3) );
   std::cout << "Foot separation: " << footSeparation << std::endl;
   double deltaY = 0.02;
-  double stepDuration = 5; //3;
-  double slopeTime = 1; // move ZMP time
-  double levelTime = 4; // keep ZMP time
+  double stepDuration = 4; //3;
+  double slopeTime = 0.8; // move ZMP time
+  double levelTime = 3.2; // keep ZMP time
   int waitSteps = 1;
   double dt = 1/gFrequency; /**< command sending period */
   // height of COM
