@@ -194,13 +194,13 @@ void PublishCommand(AtlasKinematics *AK, const VectorXd &dofs, const double left
       }
     }
 
-    // left foot kp, ki adjustment
+    // left foot kp, kd adjustment
     for (int k = 0; k < 6; k++) {
         jointcommands.kp_position[MANIP_L_FOOT*6+k+4] = jointcommands_saved.kp_position[MANIP_L_FOOT*6+k+4] * leftKp;
         jointcommands.kd_position[MANIP_L_FOOT*6+k+4] = jointcommands_saved.kd_position[MANIP_L_FOOT*6+k+4] * leftKd;
     }
 
-    // right foot kp, ki adjustment
+    // right foot kp, kd adjustment
     for (int k = 0; k < 6; k++) {
         jointcommands.kp_position[MANIP_R_FOOT*6+k+4] = jointcommands_saved.kp_position[MANIP_R_FOOT*6+k+4] * rightKp;
         jointcommands.kd_position[MANIP_R_FOOT*6+k+4] = jointcommands_saved.kd_position[MANIP_R_FOOT*6+k+4] * rightKd;
@@ -269,13 +269,13 @@ void MoveJointTractory(AtlasKinematics *AK, Skeleton *_atlas,
       }
     }
 
-    // left foot kp, ki adjustment
+    // left foot kp, kd adjustment
     for (int k = 0; k < 6; k++) {
         jointcommands.kp_position[MANIP_L_FOOT*6+k+4] = jointcommands_saved.kp_position[MANIP_L_FOOT*6+k+4] * leftKp;
         jointcommands.kd_position[MANIP_L_FOOT*6+k+4] = jointcommands_saved.kd_position[MANIP_L_FOOT*6+k+4] * leftKd;
     }
 
-    // right foot kp, ki adjustment
+    // right foot kp, kd adjustment
     for (int k = 0; k < 6; k++) {
         jointcommands.kp_position[MANIP_R_FOOT*6+k+4] = jointcommands_saved.kp_position[MANIP_R_FOOT*6+k+4] * rightKp;
         jointcommands.kd_position[MANIP_R_FOOT*6+k+4] = jointcommands_saved.kd_position[MANIP_R_FOOT*6+k+4] * rightKd;
@@ -317,9 +317,9 @@ void MoveJointTractoryAdv(AtlasKinematics *AK, Skeleton *_atlas,
                         VectorXd &dofs,
                         const std::vector<Eigen::VectorXd> &_zmp,
                         const std::vector<int> supportInfo,
-                        const VectorXd &double_support_kp, const VectorXd &double_support_ki,
-                        const VectorXd &left_support_kp, const VectorXd &left_support_ki,
-                        const VectorXd &right_support_kp, const VectorXd &right_support_ki) 
+                        const VectorXd &double_support_kp, const VectorXd &double_support_kd,
+                        const VectorXd &left_support_kp, const VectorXd &left_support_kd,
+                        const VectorXd &right_support_kp, const VectorXd &right_support_kd) 
 {
 
  /*************************************
@@ -346,7 +346,7 @@ void MoveJointTractoryAdv(AtlasKinematics *AK, Skeleton *_atlas,
         for (int j = 0; j < 4; j++) {
           jointcommands.position[j] = _zmp[i](j);
           jointcommands.kp_position[j] = jointcommands_saved.kp_position[j] * double_support_kp(j);
-          jointcommands.kd_position[j] = jointcommands_saved.kd_position[j] * double_support_ki(j);
+          jointcommands.kd_position[j] = jointcommands_saved.kd_position[j] * double_support_kd(j);
         }
 
         for (int j = 0; j < NUM_MANIPULATORS; j++) {
@@ -355,7 +355,7 @@ void MoveJointTractoryAdv(AtlasKinematics *AK, Skeleton *_atlas,
             jointcommands.kp_position[j*6+k+4] = jointcommands_saved.kp_position[j*6+k+4] * 
                                                   double_support_kp(j*6+k+4);
             jointcommands.kd_position[j*6+k+4] = jointcommands_saved.kd_position[j*6+k+4] * 
-                                                  double_support_ki(j*6+k+4);
+                                                  double_support_kd(j*6+k+4);
           }
         }
         cout << "DOUBLE_SUPPORT: " << double_support_kp.transpose() << endl;
@@ -365,7 +365,7 @@ void MoveJointTractoryAdv(AtlasKinematics *AK, Skeleton *_atlas,
         for (int j = 0; j < 4; j++) {
           jointcommands.position[j] = _zmp[i](j);
           jointcommands.kp_position[j] = jointcommands_saved.kp_position[j] * left_support_kp(j);
-          jointcommands.kd_position[j] = jointcommands_saved.kd_position[j] * left_support_ki(j);
+          jointcommands.kd_position[j] = jointcommands_saved.kd_position[j] * left_support_kd(j);
         }
         for (int j = 0; j < NUM_MANIPULATORS; j++) {
           for (int k = 0; k < 6; k++) {
@@ -373,7 +373,7 @@ void MoveJointTractoryAdv(AtlasKinematics *AK, Skeleton *_atlas,
             jointcommands.kp_position[j*6+k+4] = jointcommands_saved.kp_position[j*6+k+4] * 
                                                   left_support_kp(j*6+k+4);
             jointcommands.kd_position[j*6+k+4] = jointcommands_saved.kd_position[j*6+k+4] * 
-                                                  left_support_ki(j*6+k+4);
+                                                  left_support_kd(j*6+k+4);
           }
         }
       cout << "LEFT_SUPPORT: " << left_support_kp.transpose() << endl;
@@ -383,7 +383,7 @@ void MoveJointTractoryAdv(AtlasKinematics *AK, Skeleton *_atlas,
         for (int j = 0; j < 4; j++) {
           jointcommands.position[j] = _zmp[i](j);
           jointcommands.kp_position[j] = jointcommands_saved.kp_position[j] * right_support_kp(j);
-          jointcommands.kd_position[j] = jointcommands_saved.kd_position[j] * right_support_ki(j);
+          jointcommands.kd_position[j] = jointcommands_saved.kd_position[j] * right_support_kd(j);
         }
         for (int j = 0; j < NUM_MANIPULATORS; j++) {
           for (int k = 0; k < 6; k++) {
@@ -391,7 +391,7 @@ void MoveJointTractoryAdv(AtlasKinematics *AK, Skeleton *_atlas,
             jointcommands.kp_position[j*6+k+4] = jointcommands_saved.kp_position[j*6+k+4] * 
                                                   right_support_kp(j*6+k+4);
             jointcommands.kd_position[j*6+k+4] = jointcommands_saved.kd_position[j*6+k+4] * 
-                                                  right_support_ki(j*6+k+4);
+                                                  right_support_kd(j*6+k+4);
           }
         }
       cout << "RIGHT_SUPPORT: " << right_support_kp.transpose() << endl;
@@ -820,21 +820,21 @@ int main( int argc, char** argv ) {
   double strong_kp = 20;
   double weak_kp = 20;
 
-  double default_ki = 1.3;
-  double strong_ki = 1.3;
-  double weak_ki = 1.3;
+  double default_kd = 1.3;
+  double strong_kd = 1.3;
+  double weak_kd = 1.3;
 
-  VectorXd double_support_kp, double_support_ki;
-  VectorXd left_support_kp, left_support_ki;
-  VectorXd right_support_kp, right_support_ki;
+  VectorXd double_support_kp, double_support_kd;
+  VectorXd left_support_kp, left_support_kd;
+  VectorXd right_support_kp, right_support_kd;
 
   double_support_kp = VectorXd::Constant(28, default_kp);
-  double_support_ki = VectorXd::Constant(28, default_ki);
+  double_support_kd = VectorXd::Constant(28, default_kd);
 
   left_support_kp.resize(28);
-  left_support_ki.resize(28);
+  left_support_kd.resize(28);
   right_support_kp.resize(28);
-  right_support_ki.resize(28);
+  right_support_kd.resize(28);
   
   left_support_kp << default_kp, default_kp, default_kp, default_kp,
                      default_kp,  strong_kp, 40, strong_kp, 40, strong_kp, 
@@ -843,11 +843,11 @@ int main( int argc, char** argv ) {
                      default_kp, default_kp, default_kp, default_kp, default_kp, default_kp,
 
 
-  left_support_ki << default_ki, default_ki, default_ki, default_ki,
-                     strong_ki,  strong_ki, strong_ki, strong_ki, strong_ki, strong_ki, 
-                     weak_ki, weak_ki, weak_ki, weak_ki, weak_ki, weak_ki,
-                     default_ki, default_ki, default_ki, default_ki, default_ki, default_ki,
-                     default_ki, default_ki, default_ki, default_ki, default_ki, default_ki;
+  left_support_kd << default_kd, default_kd, default_kd, default_kd,
+                     strong_kd,  strong_kd, strong_kd, strong_kd, strong_kd, strong_kd, 
+                     weak_kd, weak_kd, weak_kd, weak_kd, weak_kd, weak_kd,
+                     default_kd, default_kd, default_kd, default_kd, default_kd, default_kd,
+                     default_kd, default_kd, default_kd, default_kd, default_kd, default_kd;
 
   right_support_kp << default_kp, default_kp, default_kp, default_kp,
                      weak_kp, weak_kp, 40, weak_kp, 20, weak_kp,
@@ -856,19 +856,19 @@ int main( int argc, char** argv ) {
                      default_kp, default_kp, default_kp, default_kp, default_kp, default_kp;
                   
  
-  right_support_ki << default_ki, default_ki, default_ki, default_ki,
-                     weak_ki, weak_ki, weak_ki, weak_ki, weak_ki, weak_ki,
-                     strong_ki,  strong_ki, strong_ki, strong_ki, strong_ki, strong_ki, 
-                     default_ki, default_ki, default_ki, default_ki, default_ki, default_ki,
-                     default_ki, default_ki, default_ki, default_ki, default_ki, default_ki;
+  right_support_kd << default_kd, default_kd, default_kd, default_kd,
+                     weak_kd, weak_kd, weak_kd, weak_kd, weak_kd, weak_kd,
+                     strong_kd,  strong_kd, strong_kd, strong_kd, strong_kd, strong_kd, 
+                     default_kd, default_kd, default_kd, default_kd, default_kd, default_kd,
+                     default_kd, default_kd, default_kd, default_kd, default_kd, default_kd;
 
 
   cout << "double kp: " << double_support_kp.transpose() << endl;
-  cout << "double ki: " << double_support_ki.transpose() << endl;
+  cout << "double kd: " << double_support_kd.transpose() << endl;
   cout << "left kp: " << left_support_kp.transpose() << endl;
-  cout << "left ki: " << left_support_ki.transpose() << endl;
+  cout << "left kd: " << left_support_kd.transpose() << endl;
   cout << "right kp: " << right_support_kp.transpose() << endl;
-  cout << "right ki: " << right_support_ki.transpose() << endl;
+  cout << "right kd: " << right_support_kd.transpose() << endl;
 
 
   /****************************************
@@ -894,9 +894,9 @@ int main( int argc, char** argv ) {
     cout << gZU.mSupportMode[i];
 
   MoveJointTractoryAdv(AK, _atlas, dofs, gZU.mWholeBody, gZU.mSupportMode, 
-                        double_support_kp,double_support_ki,
-                        left_support_kp, left_support_ki,
-                        right_support_kp, right_support_ki);
+                        double_support_kp,double_support_kd,
+                        left_support_kp, left_support_kd,
+                        right_support_kp, right_support_kd);
 
   
   

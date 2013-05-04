@@ -157,21 +157,21 @@ int main( int argc, char** argv ) {
   double strong_kp = 25; // may be higher i.e. 30
   double weak_kp = 15; // 
 
-  double default_ki = 1.2; // 1.3;
-  double strong_ki = 1.3;
-  double weak_ki = 1.1; //1.3;
+  double default_kd = 1.2; // 1.3;
+  double strong_kd = 1.3;
+  double weak_kd = 1.1; //1.3;
 
-  Eigen::VectorXd double_support_kp, double_support_ki;
-  Eigen::VectorXd left_support_kp, left_support_ki;
-  Eigen::VectorXd right_support_kp, right_support_ki;
+  Eigen::VectorXd double_support_kp, double_support_kd;
+  Eigen::VectorXd left_support_kp, left_support_kd;
+  Eigen::VectorXd right_support_kp, right_support_kd;
 
   double_support_kp = Eigen::VectorXd::Constant(28, default_kp);
-  double_support_ki = Eigen::VectorXd::Constant(28, default_ki);
+  double_support_kd = Eigen::VectorXd::Constant(28, default_kd);
   
   left_support_kp.resize(28);
-  left_support_ki.resize(28);
+  left_support_kd.resize(28);
   right_support_kp.resize(28);
-  right_support_ki.resize(28);
+  right_support_kd.resize(28);
   
 
   left_support_kp << default_kp, default_kp, default_kp, default_kp,
@@ -180,11 +180,11 @@ int main( int argc, char** argv ) {
     default_kp, default_kp, default_kp, default_kp, default_kp, default_kp,
     default_kp, default_kp, default_kp, default_kp, default_kp, default_kp;
     
-    left_support_ki << default_ki, default_ki, default_ki, default_ki,
-    strong_ki,  strong_ki, strong_ki, strong_ki, strong_ki, strong_ki, 
-    weak_ki, weak_ki, weak_ki, weak_ki, weak_ki, weak_ki,
-    default_ki, default_ki, default_ki, default_ki, default_ki, default_ki,
-    default_ki, default_ki, default_ki, default_ki, default_ki, default_ki;
+    left_support_kd << default_kd, default_kd, default_kd, default_kd,
+    strong_kd,  strong_kd, strong_kd, strong_kd, strong_kd, strong_kd, 
+    weak_kd, weak_kd, weak_kd, weak_kd, weak_kd, weak_kd,
+    default_kd, default_kd, default_kd, default_kd, default_kd, default_kd,
+    default_kd, default_kd, default_kd, default_kd, default_kd, default_kd;
     
   right_support_kp << default_kp, default_kp, default_kp, default_kp,
     weak_kp, weak_kp, 40, weak_kp, 20, weak_kp,
@@ -193,19 +193,19 @@ int main( int argc, char** argv ) {
     default_kp, default_kp, default_kp, default_kp, default_kp, default_kp;
                 
  
-  right_support_ki << default_ki, default_ki, default_ki, default_ki,
-    weak_ki, weak_ki, weak_ki, weak_ki, weak_ki, weak_ki,
-    strong_ki,  strong_ki, strong_ki, strong_ki, strong_ki, strong_ki, 
-    default_ki, default_ki, default_ki, default_ki, default_ki, default_ki,
-    default_ki, default_ki, default_ki, default_ki, default_ki, default_ki;
+  right_support_kd << default_kd, default_kd, default_kd, default_kd,
+    weak_kd, weak_kd, weak_kd, weak_kd, weak_kd, weak_kd,
+    strong_kd,  strong_kd, strong_kd, strong_kd, strong_kd, strong_kd, 
+    default_kd, default_kd, default_kd, default_kd, default_kd, default_kd,
+    default_kd, default_kd, default_kd, default_kd, default_kd, default_kd;
   
   if( gJohnnieDebug ) {
     std::cout << "double kp: " << double_support_kp.transpose() << std::endl;
-    std::cout << "double ki: " << double_support_ki.transpose() << std::endl;
+    std::cout << "double kd: " << double_support_kd.transpose() << std::endl;
     std::cout << "left kp: " << left_support_kp.transpose() << std::endl;
-    std::cout << "left ki: " << left_support_ki.transpose() << std::endl;
+    std::cout << "left kd: " << left_support_kd.transpose() << std::endl;
     std::cout << "right kp: " << right_support_kp.transpose() << std::endl;
-    std::cout << "right ki: " << right_support_ki.transpose() << std::endl;
+    std::cout << "right kd: " << right_support_kd.transpose() << std::endl;
   }
 
   /****************************************
@@ -235,9 +235,9 @@ int main( int argc, char** argv ) {
 
   MoveJointTractoryAdv( gAK, gAtlasSkel, dofs, 
 			gZU.mWholeBody, gZU.mSupportMode, 
-                        double_support_kp,double_support_ki,
-                        left_support_kp, left_support_ki,
-                        right_support_kp, right_support_ki);
+                        double_support_kp,double_support_kd,
+                        left_support_kp, left_support_kd,
+                        right_support_kp, right_support_kd);
 
   // *********
   // THE END
@@ -548,13 +548,13 @@ void PublishCommand( atlas::AtlasKinematics *_AK, const Eigen::VectorXd &_dofs,
     }
   }
   
-  // left foot kp, ki adjustment
+  // left foot kp, kd adjustment
   for (int k = 0; k < 6; k++) {
     gAtlasCommand.kp_position[atlas::MANIP_L_FOOT*6+k+4] = gAtlasCommand_saved.kp_position[atlas::MANIP_L_FOOT*6+k+4] * _leftKp;
     gAtlasCommand.kd_position[atlas::MANIP_L_FOOT*6+k+4] = gAtlasCommand_saved.kd_position[atlas::MANIP_L_FOOT*6+k+4] * _leftKd;
   }
   
-  // right foot kp, ki adjustment
+  // right foot kp, kd adjustment
   for (int k = 0; k < 6; k++) {
     gAtlasCommand.kp_position[atlas::MANIP_R_FOOT*6+k+4] = gAtlasCommand_saved.kp_position[atlas::MANIP_R_FOOT*6+k+4] * _rightKp;
     gAtlasCommand.kd_position[atlas::MANIP_R_FOOT*6+k+4] = gAtlasCommand_saved.kd_position[atlas::MANIP_R_FOOT*6+k+4] * _rightKd;
@@ -687,9 +687,9 @@ void MoveJointTractoryAdv( atlas::AtlasKinematics *AK,
 			   Eigen::VectorXd &dofs,
 			   const std::vector<Eigen::VectorXd> &_zmp,
 			   const std::vector<int> supportInfo,
-			   const Eigen::VectorXd &double_support_kp, const Eigen::VectorXd &double_support_ki,
-			   const Eigen::VectorXd &left_support_kp, const Eigen::VectorXd &left_support_ki,
-			   const Eigen::VectorXd &right_support_kp, const Eigen::VectorXd &right_support_ki) {
+			   const Eigen::VectorXd &double_support_kp, const Eigen::VectorXd &double_support_kd,
+			   const Eigen::VectorXd &left_support_kp, const Eigen::VectorXd &left_support_kd,
+			   const Eigen::VectorXd &right_support_kp, const Eigen::VectorXd &right_support_kd) {
 
   // Update pos
   Eigen::VectorXd dofs_save; 
@@ -714,7 +714,7 @@ void MoveJointTractoryAdv( atlas::AtlasKinematics *AK,
       for (int j = 0; j < 4; j++) {
 	gAtlasCommand.position[j] = _zmp[i](j);
 	gAtlasCommand.kp_position[j] = gAtlasCommand_saved.kp_position[j] * double_support_kp(j);
-	gAtlasCommand.kd_position[j] = gAtlasCommand_saved.kd_position[j] * double_support_ki(j);
+	gAtlasCommand.kd_position[j] = gAtlasCommand_saved.kd_position[j] * double_support_kd(j);
       }
       
       for (int j = 0; j < atlas::NUM_MANIPULATORS; j++) {
@@ -723,7 +723,7 @@ void MoveJointTractoryAdv( atlas::AtlasKinematics *AK,
 	  gAtlasCommand.kp_position[j*6+k+4] = gAtlasCommand_saved.kp_position[j*6+k+4] * 
 	    double_support_kp(j*6+k+4);
             gAtlasCommand.kd_position[j*6+k+4] = gAtlasCommand_saved.kd_position[j*6+k+4] * 
-	      double_support_ki(j*6+k+4);
+	      double_support_kd(j*6+k+4);
 	}
       }
       if( gJohnnieDebug ) std::cout << "DOUBLE_SUPPORT: " << double_support_kp.transpose() << std::endl;
@@ -733,7 +733,7 @@ void MoveJointTractoryAdv( atlas::AtlasKinematics *AK,
       for (int j = 0; j < 4; j++) {
 	gAtlasCommand.position[j] = _zmp[i](j);
 	gAtlasCommand.kp_position[j] = gAtlasCommand_saved.kp_position[j] * left_support_kp(j);
-	gAtlasCommand.kd_position[j] = gAtlasCommand_saved.kd_position[j] * left_support_ki(j);
+	gAtlasCommand.kd_position[j] = gAtlasCommand_saved.kd_position[j] * left_support_kd(j);
       }
       for (int j = 0; j < atlas::NUM_MANIPULATORS; j++) {
 	for (int k = 0; k < 6; k++) {
@@ -741,7 +741,7 @@ void MoveJointTractoryAdv( atlas::AtlasKinematics *AK,
 	  gAtlasCommand.kp_position[j*6+k+4] = gAtlasCommand_saved.kp_position[j*6+k+4] * 
 	    left_support_kp(j*6+k+4);
 	  gAtlasCommand.kd_position[j*6+k+4] = gAtlasCommand_saved.kd_position[j*6+k+4] * 
-	    left_support_ki(j*6+k+4);
+	    left_support_kd(j*6+k+4);
 	}
       }
       if( gJohnnieDebug ) { std::cout << "LEFT_SUPPORT: " << left_support_kp.transpose() << std::endl; }
@@ -751,7 +751,7 @@ void MoveJointTractoryAdv( atlas::AtlasKinematics *AK,
       for (int j = 0; j < 4; j++) {
 	gAtlasCommand.position[j] = _zmp[i](j);
 	gAtlasCommand.kp_position[j] = gAtlasCommand_saved.kp_position[j] * right_support_kp(j);
-	gAtlasCommand.kd_position[j] = gAtlasCommand_saved.kd_position[j] * right_support_ki(j);
+	gAtlasCommand.kd_position[j] = gAtlasCommand_saved.kd_position[j] * right_support_kd(j);
       }
       for (int j = 0; j < atlas::NUM_MANIPULATORS; j++) {
 	for (int k = 0; k < 6; k++) {
@@ -759,7 +759,7 @@ void MoveJointTractoryAdv( atlas::AtlasKinematics *AK,
 	  gAtlasCommand.kp_position[j*6+k+4] = gAtlasCommand_saved.kp_position[j*6+k+4] * 
 	    right_support_kp(j*6+k+4);
 	  gAtlasCommand.kd_position[j*6+k+4] = gAtlasCommand_saved.kd_position[j*6+k+4] * 
-	    right_support_ki(j*6+k+4);
+	    right_support_kd(j*6+k+4);
 	}
       }
       if( gJohnnieDebug ) { std::cout << "RIGHT_SUPPORT: " << right_support_kp.transpose() << std::endl; }
