@@ -122,7 +122,7 @@ int main( int argc, char** argv ) {
 
   // Set parameters for ZMP walker
   int numSteps = 30; //30;
-  double stepLength = 0.20; // half step
+  double stepLength = 0.15; // half step
   double stepHeight = 0.05;
   // Update states to get foot separation and CoM height (z)  
   dofs_save = gAtlasSkel->getPose();
@@ -140,9 +140,9 @@ int main( int argc, char** argv ) {
 			    gAK->getLimbTransW( gAtlasSkel, Twb, atlas::MANIP_R_FOOT)(1,3) );
   std::cout << "Foot separation: " << footSeparation << std::endl;
   double deltaY = 0.02;
-  double stepDuration = 3; //3;
-  double slopeTime = 0.5; // move ZMP time
-  double levelTime = 2.5; // keep ZMP time
+  double stepDuration = 4; //3;
+  double slopeTime = 0.8; // move ZMP time
+  double levelTime = 3.2; // keep ZMP time
   int waitSteps = 1;
   double dt = 1/gFrequency; /**< command sending period */
   // height of COM
@@ -435,7 +435,7 @@ bool setKinematics() {
 
   {
     DartLoader dart_loader;
-    robotics::World *world = dart_loader.parseWorld( ATLAS_DATA_PATH "atlas/atlas_world.urdf" );
+    simulation::World *world = dart_loader.parseWorld( ATLAS_DATA_PATH "atlas/atlas_world.urdf" );
     gAtlasSkel = world->getSkeleton( "atlas" );
     gAK = new atlas::AtlasKinematics();
     gAK->init( gAtlasSkel );

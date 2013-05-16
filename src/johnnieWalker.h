@@ -20,7 +20,7 @@
 
 // Dart
 #include <robotics/parser/dart_parser/DartLoader.h>
-#include <robotics/World.h>
+#include <simulation/World.h>
 #include <dynamics/SkeletonDynamics.h>
 #include <kinematics/FileInfoSkel.hpp>
 

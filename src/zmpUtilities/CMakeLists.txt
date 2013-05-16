@@ -7,3 +7,6 @@ include_directories( . tinyWalker /home/ana/Research/ROBOT/ROSZMPWalker/src/zmpU
 add_library( zmpUtilities zmpUtilities.cpp to_be_erased.cpp zmpUtilities.h )
 target_link_libraries( zmpUtilities tinyWalker )
 set_target_properties( zmpUtilities PROPERTIES LIBRARY_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/lib" ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/lib" )
+
+# Add tests subdirectory
+add_subdirectory( tests )

@@ -15,7 +15,7 @@
 #include <utils/AtlasPaths.h>
 
 #include <robotics/parser/dart_parser/DartLoader.h>
-#include <robotics/World.h>
+#include <simulation/World.h>
 #include <kinematics/Skeleton.h>
 #include <kinematics/Dof.h>
 #include <kinematics/BodyNode.h>
@@ -667,7 +667,7 @@ atlas::AtlasKinematics* zmpUtilities::prepareAtlasKinematics() {
 
     DartLoader dart_loader;
    printf("Loading skel \n");
-    robotics::World *mWorld = dart_loader.parseWorld(ATLAS_DATA_PATH "atlas/atlas_world.urdf");
+    simulation::World *mWorld = dart_loader.parseWorld(ATLAS_DATA_PATH "atlas/atlas_world.urdf");
 	printf("End loading skel \n");
     mAtlasSkel = mWorld->getSkeleton("atlas");
     mAtlasKin = new atlas::AtlasKinematics();

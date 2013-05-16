@@ -31,14 +31,13 @@ add_subdirectory( zmpUtilities )
 include_directories( . zmpUtilities/tinyWalker )
 
 # Eric code
-#rosbuild_add_executable( zmp_walk zmp/zmp_walk.cpp zmp/main.cpp)
-#target_link_libraries( zmp_walk dart_atlas ${DART_LIBRARIES} ${DARTExt_LIBRARIES})
-
-# Ana and Xinyan's code
-# Add plugin that works with DRCSim 2.2
-#rosbuild_add_executable( publish_and_readonce publish_and_readonce.cpp )
-#target_link_libraries( publish_and_readonce ${DART_LIBRARIES} ${DARTExt_LIBRARIES} dart_atlas zmpUtilities )
+rosbuild_add_executable( zmp_walk zmp/zmp_walk.cpp zmp/main.cpp)
+target_link_libraries( zmp_walk dart_atlas ${DART_LIBRARIES} ${DARTExt_LIBRARIES} zmpUtilities )
 
 # Plugin that works in DRCSim 2.5 and is cleaner
 rosbuild_add_executable( johnnieWalker johnnieWalker.cpp )
 target_link_libraries( johnnieWalker ${DART_LIBRARIES} ${DARTExt_LIBRARIES} dart_atlas zmpUtilities )
+
+##################
+# Add Matahari
+add_subdirectory( matahari )

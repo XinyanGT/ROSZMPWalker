@@ -116,7 +116,7 @@ int main( int argc, char** argv ) {
 	double footsep_y = 0.085; // half of horizontal separation distance between feet
 	double foot_liftoff_z = 0.05; // foot liftoff height
 
-	double step_length = 0.05;
+	double step_length = 0.15;
 	bool walk_sideways = false;
 
 	double com_height = 0.48; // height of COM above ANKLE

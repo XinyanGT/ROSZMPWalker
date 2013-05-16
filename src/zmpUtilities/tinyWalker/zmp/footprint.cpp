@@ -93,21 +93,23 @@ vector<Footprint> walkCircle(double radius,
     int K = max(K_step_length, K_angle);
     double dTheta = alpha/K * (radius > 0 ? 1 : -1 );
 
-#ifdef DEBUG
+    //#ifdef DEBUG
+    std::cout << "Alpha is: " << alpha << std::endl;
+    printf("Distance: %f radius: %f \n", distance, radius);
     cout << "outer_dist IS " << outer_dist << endl;
     cout << outer_dist / max_step_length << endl;
     cout << "Ksl IS " << K_step_length << endl;
     cout << "Kang IS " << K_angle << endl;
     cout << "K IS " << K << endl;
     cout << "dTheta IS " << dTheta << endl;
-#endif
+    //#endif
 
     // init results list
     vector<Footprint> result;
 
     // fill out results
     for(int i = 2; i < K + 1; i++) {
-        double theta_i = dTheta * (i - 1);
+      double theta_i = dTheta * (i - 1);
         if (is_even(i) xor left_is_stance_foot) { // i odd means this step is for the stance foot
             result.push_back(Footprint((radius - width) * sin(theta_i),
                                        radius - ((radius - width) * cos(theta_i)),

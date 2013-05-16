@@ -1,7 +1,3 @@
-cmake_minimum_required (VERSION 2.8)
-
-project (convertJoints)
-
 ###############
 # Compile flags
 if(WIN32)
@@ -33,7 +29,7 @@ find_package(DART REQUIRED)
 
 ######################
 # Set vrc-golem path
-set( VRC_GOLEM_PATH /home/ana/Software/DG_LAB/vrc-golem )
+set( VRC_GOLEM_PATH /home/ana/Software/golems/vrc-golem )
 
 include_directories( ${DARTExt_INCLUDEDIR} )
 include_directories( ${DART_INCLUDEDIR} )
@@ -43,8 +39,8 @@ link_directories(${DART_LIBRARY_DIRS})
 link_directories( ${VRC_GOLEM_PATH}/dart-atlas/lib )
 
 # Search all header and source files
-set ( zmp_src ../zmpUtilities.cpp )
-set ( zmp_hdr ../zmpUtilities.h )
 
-add_executable( generateTraj generateTraj.cpp ${zmp_src} ${zmp_hdr} )
-target_link_libraries( generateTraj ${DART_LIBRARIES} ${DARTExt_LIBRARIES} dart_atlas )
+add_executable( generateTraj generateTraj.cpp )
+target_link_libraries( generateTraj  zmpUtilities dart_atlas ${DART_LIBRARIES} ${DARTExt_LIBRARIES} )
+add_executable( testFootprints testFootprints.cpp ${zmp_src} ${zmp_hdr} )
+target_link_libraries( testFootprints  zmpUtilities tinyWalker  dart_atlas ${DART_LIBRARIES} ${DARTExt_LIBRARIES} )

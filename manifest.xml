@@ -1,13 +1,15 @@
 <package>
-  <description brief="ROSZMPWalker">
+  <description brief="lucila">
 
-     ZMPWalker
+     lucila
 
   </description>
   <author>Eric Huang, Xinyan Yan and Ana Huaman (plus some code based on Matt's Zucker hubomz)</author>
   <license>BSD</license>
   <review status="unreviewed" notes=""/>
-  <url>http://ros.org/wiki/ZMPWalker</url>
+  <url>http://ros.org/wiki/lucila</url>
+
+  <!-- We are old-school, so we use C++ -->
   <depend package="roscpp"/>
   <depend package="trajectory_msgs"/>
   <depend package="osrf_msgs"/>
